@@ -550,16 +550,13 @@ display interface description | include ${portOnly}
         if (localInterface && localInterface.fullName) {
           const ifName = getCliInterfaceName(localInterface);
 
-          commands += `# Interface
+          commands += `# Interface / Optical / Error / Traffic
 display interface ${ifName}
 
 # Config ของ Port
+# หมายเหตุ: คำสั่งนี้อาจต้องใช้สิทธิ์สูงกว่า User ปัจจุบัน
+# ถ้า Error "You do not have permission" ให้ข้ามคำสั่งนี้
 display current-configuration interface ${ifName}
-
-# Optical / Error / Traffic
-# หมายเหตุ: บางรุ่นไม่รองรับ display transceiver
-# ให้ดู RX/TX, CRC, Traffic จาก display interface เป็นหลัก
-display interface ${ifName}
 
 `;
         }
@@ -575,6 +572,11 @@ display logbuffer
 
 # Description
 display interface description
+
+# Description เฉพาะ Port / Link
+display interface description | include ${
+          localInterface ? localInterface.port : ''
+        }
 `;
 
         if (jobType === 'CPU HIGH') {
