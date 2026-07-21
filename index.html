@@ -351,23 +351,18 @@ JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR หรือ O
         let commands = '';
 
         if (localInterface && localInterface.fullName) {
+          const ifName = buildHuaweiCliInterfaceName(localInterface);
+
           commands += `# Interface
-display interface ${localInterface.fullName}
+display interface ${ifName}
 
-`;
+# Config ของ Port
+display current-configuration interface ${ifName}
 
-          if (isPhysicalInterface(localInterface)) {
-            commands += `# Optical Power
-display transceiver interface ${localInterface.fullName}
-
-# MAC Address
-display mac-address interface ${localInterface.fullName}
-
-`;
-          }
-
-          commands += `# Config ของ Port
-display current-configuration interface ${localInterface.fullName}
+# Optical / Error / Traffic
+# หมายเหตุ: บางรุ่นไม่รองรับ display transceiver
+# ให้ดู RX/TX, CRC, Traffic จาก display interface เป็นหลัก
+display interface ${ifName}
 
 `;
         }
@@ -395,16 +390,6 @@ display memory-usage
 
 # Version / Uptime
 display version
-`;
-        }
-
-        if (jobType === 'POWER ALARM') {
-          commands += `
-# Power / Alarm
-display alarm active
-
-# Log
-display logbuffer
 `;
         }
 
@@ -989,7 +974,7 @@ undo shutdown ${localInterface.port}`;
 
 system-view
 
-interface ${localInterface.fullName}
+interface ${buildHuaweiCliInterfaceName(localInterface)}
 
 shutdown
 
@@ -1023,7 +1008,12 @@ undo shutdown`;
           const localDevice = devices[0] || '-';
           const peerDevice = devices[1] || '-';
 
-          const physicalInterfaces = extractInterfaces(text);
+          const discoveredInterfaces = extractInterfacesFromDescription(text);
+
+          const physicalInterfaces =
+            discoveredInterfaces.length > 0
+              ? discoveredInterfaces
+              : extractInterfaces(text);
           const gponPorts = extractGponPorts(text);
 
           const localInterface = physicalInterfaces[0] || null;
@@ -1193,6 +1183,66 @@ ssh username@${cleanLocalDevice}
 # หากชื่อ Peer มีวงเล็บ เช่น ME-3701-101(MDH)
 # ระบบจะตัดเหลือ ME-3701-101 สำหรับใช้ SSH
 `;
+      }
+      function buildHuaweiCliInterfaceName(interfaceObj) {
+        if (!interfaceObj) {
+          return '-';
+        }
+
+        const portOnly = `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
+
+        if (interfaceObj.type === 'GE') {
+          return `GigabitEthernet ${portOnly}`;
+        }
+
+        if (interfaceObj.type === 'GigabitEthernet') {
+          return `GigabitEthernet ${portOnly}`;
+        }
+
+        if (
+          interfaceObj.type === '10GE' ||
+          interfaceObj.type === '25GE' ||
+          interfaceObj.type === '40GE' ||
+          interfaceObj.type === '100GE'
+        ) {
+          return `${interfaceObj.type} ${portOnly}`;
+        }
+
+        return interfaceObj.fullName;
+      }
+      function extractInterfacesFromDescription(text) {
+        const interfaces = [];
+
+        const lines = text.split(/\r?\n/);
+
+        const lineRegex =
+          /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down)/i;
+
+        lines.forEach(function (line) {
+          const match = line.match(lineRegex);
+
+          if (match) {
+            const type = match[1];
+            const portOnly = match[2];
+            const speed = match[3] || '';
+
+            const parts = portOnly.split('/');
+
+            interfaces.push({
+              type: type,
+              frame: parts[0],
+              slot: parts[1],
+              port: parts[2],
+              speed: speed,
+
+              fullName: speed
+                ? `${type}${portOnly}(${speed})`
+                : `${type}${portOnly}`,
+            });
+          }
+        });
+
+        return removeDuplicate(interfaces);
       }
     </script>
   </body>
