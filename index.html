@@ -1,146 +1,146 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Huawei NOC / OLT Assistant</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Huawei NOC / OLT Assistant</title>
 
-  <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f4f6f9;
-      padding: 20px;
-      margin: 0;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    .card {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      text-align: center;
-      color: #1976d2;
-    }
-
-    h3 {
-      color: #222;
-    }
-
-    textarea {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 12px;
-      box-sizing: border-box;
-      font-size: 14px;
-      line-height: 1.5;
-      resize: vertical;
-    }
-
-    #jobInput {
-      min-height: 220px;
-    }
-
-    #result {
-      min-height: 780px;
-      white-space: pre;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin: 15px 0;
-    }
-
-    button {
-      position: relative;
-      overflow: hidden;
-      flex: 1;
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-      transition: all 0.25s ease;
-    }
-
-    .me {
-      background: linear-gradient(135deg, #2196f3, #0d47a1);
-    }
-
-    .olt {
-      background: linear-gradient(135deg, #ff9800, #e65100);
-    }
-
-    .clear {
-      background: linear-gradient(135deg, #f44336, #b71c1c);
-    }
-
-    button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-      opacity: 0.95;
-      padding-right: 42px;
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    button::after {
-      position: absolute;
-      right: 18px;
-      opacity: 0;
-      transform: translateX(12px);
-      transition: all 0.25s ease;
-    }
-
-    .me::after {
-      content: "🌐";
-    }
-
-    .olt::after {
-      content: "🟠";
-    }
-
-    .clear::after {
-      content: "🧹";
-    }
-
-    button:hover::after {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    @media (max-width: 768px) {
-      .buttons {
-        flex-direction: column;
+    <style>
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+        padding: 20px;
+        margin: 0;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <div class="container">
-    <div class="card">
-      <h1>🔧 Huawei Assistant</h1>
+      .container {
+        max-width: 1200px;
+        margin: auto;
+      }
 
-      <h3>📥 Job Ticket</h3>
+      .card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
 
-      <textarea
-        id="jobInput"
-        placeholder="วาง Job Ticket ที่นี่ เช่น
+      h1 {
+        text-align: center;
+        color: #1976d2;
+      }
+
+      h3 {
+        color: #222;
+      }
+
+      textarea {
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 12px;
+        box-sizing: border-box;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: vertical;
+      }
+
+      #jobInput {
+        min-height: 220px;
+      }
+
+      #result {
+        min-height: 780px;
+        white-space: pre;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+      }
+
+      button {
+        position: relative;
+        overflow: hidden;
+        flex: 1;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 15px;
+        transition: all 0.25s ease;
+      }
+
+      .me {
+        background: linear-gradient(135deg, #2196f3, #0d47a1);
+      }
+
+      .olt {
+        background: linear-gradient(135deg, #ff9800, #e65100);
+      }
+
+      .clear {
+        background: linear-gradient(135deg, #f44336, #b71c1c);
+      }
+
+      button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+        opacity: 0.95;
+        padding-right: 42px;
+      }
+
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      button::after {
+        position: absolute;
+        right: 18px;
+        opacity: 0;
+        transform: translateX(12px);
+        transition: all 0.25s ease;
+      }
+
+      .me::after {
+        content: '🌐';
+      }
+
+      .olt::after {
+        content: '🟠';
+      }
+
+      .clear::after {
+        content: '🧹';
+      }
+
+      button:hover::after {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      @media (max-width: 768px) {
+        .buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>🔧 Huawei Assistant</h1>
+
+        <h3>📥 Job Ticket</h3>
+
+        <textarea
+          id="jobInput"
+          placeholder="วาง Job Ticket ที่นี่ เช่น
 
 ME Job:
 JB26-9999999 : Service Degraded : 3BB_Metronet CRC Error -MME-3720-31 10GE0-2-1 to ME-3701-101(MDH)_link1_0/3/1_OFC-null + CRC ERROR : Minor
@@ -153,296 +153,298 @@ GE0/2/0(10G)    up    up    MME-3513-31(BKN)_link2_0/5/2_OFC
 
 OLT Job:
 JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR"
-      ></textarea>
+        ></textarea>
 
-      <div class="buttons">
-        <button class="me" onclick="analyzeJob('ME')">
-          🔧 Huawei NOC_ME Assistant
-        </button>
+        <div class="buttons">
+          <button class="me" onclick="analyzeJob('ME')">
+            🔧 Huawei NOC_ME Assistant
+          </button>
 
-        <button class="olt" onclick="analyzeJob('OLT')">
-          🟠 Huawei OLT Assistant
-        </button>
+          <button class="olt" onclick="analyzeJob('OLT')">
+            🟠 Huawei OLT Assistant
+          </button>
 
-        <button class="clear" onclick="clearAll()">
-          🗑 Clear
-        </button>
+          <button class="clear" onclick="clearAll()">🗑 Clear</button>
+        </div>
+
+        <h3>📄 Result</h3>
+
+        <textarea id="result"></textarea>
       </div>
-
-      <h3>📄 Result</h3>
-
-      <textarea id="result"></textarea>
     </div>
-  </div>
 
-  <script>
-    function checkFactoryAuth() {
-      const auth = JSON.parse(localStorage.getItem("factoryAuth"));
+    <script>
+      function checkFactoryAuth() {
+        const auth = JSON.parse(localStorage.getItem('factoryAuth'));
 
-      if (!auth) {
-        location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
-        return false;
+        if (!auth) {
+          location.replace(
+            'https://pongthepstar8-web.github.io/tool-launcher/'
+          );
+          return false;
+        }
+
+        const expireTime = 8 * 60 * 60 * 1000;
+
+        if (Date.now() - auth.loginTime > expireTime) {
+          localStorage.clear();
+          location.replace(
+            'https://pongthepstar8-web.github.io/tool-launcher/'
+          );
+          return false;
+        }
+
+        return true;
       }
 
-      const expireTime = 8 * 60 * 60 * 1000;
+      checkFactoryAuth();
 
-      if (Date.now() - auth.loginTime > expireTime) {
-        localStorage.clear();
-        location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
-        return false;
+      function cleanText(text) {
+        return String(text)
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/&lt;br\s*\/?&gt;/gi, '\n')
+          .replace(/&amp;lt;br&amp;gt;/gi, '\n')
+          .replace(/\r/g, '')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
       }
 
-      return true;
-    }
+      function cleanOutputText(text) {
+        return cleanText(text);
+      }
 
-    checkFactoryAuth();
+      function normalizeInterfaceType(type) {
+        const upper = String(type).toUpperCase();
 
-    function cleanText(text) {
-      return String(text)
-        .replace(/<br\s*\/?>/gi, "\n")
-        .replace(/&lt;br\s*\/?&gt;/gi, "\n")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
-    }
+        if (upper === 'GE') return 'GigabitEthernet';
+        if (upper === 'GIGABITETHERNET') return 'GigabitEthernet';
+        if (upper === '10GE') return '10GE';
+        if (upper === '25GE') return '25GE';
+        if (upper === '40GE') return '40GE';
+        if (upper === '100GE') return '100GE';
 
-    function cleanOutputText(text) {
-      return cleanText(text);
-    }
+        return type;
+      }
 
-    function normalizeInterfaceType(type) {
-      const upper = String(type).toUpperCase();
+      function removeDuplicate(items) {
+        const map = new Map();
 
-      if (upper === "GE") return "GigabitEthernet";
-      if (upper === "GIGABITETHERNET") return "GigabitEthernet";
-      if (upper === "10GE") return "10GE";
-      if (upper === "25GE") return "25GE";
-      if (upper === "40GE") return "40GE";
-      if (upper === "100GE") return "100GE";
-
-      return type;
-    }
-
-    function removeDuplicate(items) {
-      const map = new Map();
-
-      items.forEach(function (item) {
-        map.set(item.fullName, item);
-      });
-
-      return Array.from(map.values());
-    }
-
-    function extractInterfaces(text) {
-      const interfaces = [];
-
-      const interfaceRegex =
-        /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
-
-      let match;
-
-      while ((match = interfaceRegex.exec(text)) !== null) {
-        const type = normalizeInterfaceType(match[1]);
-        const frame = match[2];
-        const slot = match[3];
-        const port = match[4];
-
-        interfaces.push({
-          type,
-          frame,
-          slot,
-          port,
-          fullName: `${type} ${frame}/${slot}/${port}`,
-          cliName: `${type} ${frame}/${slot}/${port}`
+        items.forEach(function (item) {
+          map.set(item.fullName, item);
         });
+
+        return Array.from(map.values());
       }
 
-      const trunkRegex = /Eth-Trunk\s*(\d+)/gi;
+      function extractInterfaces(text) {
+        const interfaces = [];
 
-      while ((match = trunkRegex.exec(text)) !== null) {
-        interfaces.push({
-          type: "Eth-Trunk",
-          number: match[1],
-          fullName: `Eth-Trunk ${match[1]}`,
-          cliName: `Eth-Trunk ${match[1]}`
-        });
-      }
+        const interfaceRegex =
+          /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
 
-      const vlanifRegex = /Vlanif\s*(\d+)/gi;
+        let match;
 
-      while ((match = vlanifRegex.exec(text)) !== null) {
-        interfaces.push({
-          type: "Vlanif",
-          number: match[1],
-          fullName: `Vlanif ${match[1]}`,
-          cliName: `Vlanif ${match[1]}`
-        });
-      }
-
-      return removeDuplicate(interfaces);
-    }
-
-    function extractInterfacesFromDescription(text) {
-      const interfaces = [];
-      const lines = cleanText(text).split(/\r?\n/);
-
-      const lineRegex =
-        /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
-
-      lines.forEach(function (line) {
-        const match = line.match(lineRegex);
-
-        if (match) {
-          const rawType = match[1];
-          const portOnly = match[2];
-          const speed = match[3] || "";
-          const parts = portOnly.split("/");
-
-          let cliType = rawType;
-
-          if (rawType === "GE") {
-            cliType = "GigabitEthernet";
-          }
+        while ((match = interfaceRegex.exec(text)) !== null) {
+          const type = normalizeInterfaceType(match[1]);
+          const frame = match[2];
+          const slot = match[3];
+          const port = match[4];
 
           interfaces.push({
-            type: rawType,
-            cliType,
-            frame: parts[0],
-            slot: parts[1],
-            port: parts[2],
-            speed,
-            fullName: speed
-              ? `${rawType}${portOnly}(${speed})`
-              : `${rawType}${portOnly}`,
-            cliName: `${cliType} ${portOnly}`
+            type,
+            frame,
+            slot,
+            port,
+            fullName: `${type} ${frame}/${slot}/${port}`,
+            cliName: `${type} ${frame}/${slot}/${port}`,
           });
         }
-      });
 
-      return removeDuplicate(interfaces);
-    }
+        const trunkRegex = /Eth-Trunk\s*(\d+)/gi;
 
-    function extractGponPorts(text) {
-      const ports = [];
+        while ((match = trunkRegex.exec(text)) !== null) {
+          interfaces.push({
+            type: 'Eth-Trunk',
+            number: match[1],
+            fullName: `Eth-Trunk ${match[1]}`,
+            cliName: `Eth-Trunk ${match[1]}`,
+          });
+        }
 
-      const regex =
-        /GPON\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
+        const vlanifRegex = /Vlanif\s*(\d+)/gi;
 
-      let match;
+        while ((match = vlanifRegex.exec(text)) !== null) {
+          interfaces.push({
+            type: 'Vlanif',
+            number: match[1],
+            fullName: `Vlanif ${match[1]}`,
+            cliName: `Vlanif ${match[1]}`,
+          });
+        }
 
-      while ((match = regex.exec(text)) !== null) {
-        ports.push({
-          frame: match[1],
-          slot: match[2],
-          port: match[3],
-          fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`
+        return removeDuplicate(interfaces);
+      }
+
+      function extractInterfacesFromDescription(text) {
+        const interfaces = [];
+        const lines = cleanText(text).split(/\r?\n/);
+
+        const lineRegex =
+          /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
+
+        lines.forEach(function (line) {
+          const match = line.match(lineRegex);
+
+          if (match) {
+            const rawType = match[1];
+            const portOnly = match[2];
+            const speed = match[3] || '';
+            const parts = portOnly.split('/');
+
+            let cliType = rawType;
+
+            if (rawType === 'GE') {
+              cliType = 'GigabitEthernet';
+            }
+
+            interfaces.push({
+              type: rawType,
+              cliType: cliType,
+              frame: parts[0],
+              slot: parts[1],
+              port: parts[2],
+              speed: speed,
+              fullName: speed
+                ? `${rawType}${portOnly}(${speed})`
+                : `${rawType}${portOnly}`,
+              cliName: `${cliType} ${portOnly}`,
+            });
+          }
         });
+
+        return removeDuplicate(interfaces);
       }
 
-      return removeDuplicate(ports);
-    }
+      function extractGponPorts(text) {
+        const ports = [];
 
-    function extractDevices(text) {
-      const devices = [];
+        const regex = /GPON\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
 
-      const deviceRegex =
-        /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|OLT[-_A-Z0-9]*|OX[-_A-Z0-9]*)/gi;
+        let match;
 
-      let match;
+        while ((match = regex.exec(text)) !== null) {
+          ports.push({
+            frame: match[1],
+            slot: match[2],
+            port: match[3],
+            fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`,
+          });
+        }
 
-      while ((match = deviceRegex.exec(text)) !== null) {
-        devices.push(match[1]);
+        return removeDuplicate(ports);
       }
 
-      return Array.from(new Set(devices));
-    }
+      function extractDevices(text) {
+        const devices = [];
 
-    function extractPeerPortFromLink(text) {
-      const peerMatch = text.match(/link\d*_(\d+)\/(\d+)\/(\d+)/i);
+        const deviceRegex =
+          /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|OLT[-_A-Z0-9]*|OX[-_A-Z0-9]*)/gi;
 
-      if (peerMatch) {
-        return `${peerMatch[1]}/${peerMatch[2]}/${peerMatch[3]}`;
+        let match;
+
+        while ((match = deviceRegex.exec(text)) !== null) {
+          devices.push(match[1]);
+        }
+
+        return Array.from(new Set(devices));
       }
 
-      return "-";
-    }
+      function extractPeerPortFromLink(text) {
+        const peerMatch = text.match(/link\d*_(\d+)\/(\d+)\/(\d+)/i);
 
-    function extractTicket(text) {
-      const match = text.match(/JB\d+-\d+/i);
-      return match ? match[0] : "-";
-    }
+        if (peerMatch) {
+          return `${peerMatch[1]}/${peerMatch[2]}/${peerMatch[3]}`;
+        }
 
-    function extractSeverity(text) {
-      const match = text.match(/\b(Critical|Major|Minor)\b/i);
-      return match ? match[1] : "Unknown";
-    }
-
-    function extractService(text) {
-      if (/Service Degraded/i.test(text)) return "Service Degraded";
-      if (/Service Unaffected/i.test(text)) return "Service Unaffected";
-      if (/Service Interrupted/i.test(text)) return "Service Interrupted";
-      return "-";
-    }
-
-    function extractJobType(text) {
-      if (/CRC/i.test(text)) return "CRC ERROR";
-      if (/LINK DOWN/i.test(text)) return "LINK DOWN";
-      if (/\bLOS\b/i.test(text)) return "LOS";
-      if (/CPU/i.test(text)) return "CPU HIGH";
-      if (/POWER|ไฟดับ/i.test(text)) return "POWER ALARM";
-      if (/TEMP|TEMPERATURE/i.test(text)) return "TEMPERATURE ALARM";
-      return "UNKNOWN";
-    }
-
-    function detectOltModel(text) {
-      if (/MA5608T/i.test(text)) return "MA5608T";
-      if (/MA5800/i.test(text)) return "MA5800";
-      return "UNKNOWN";
-    }
-
-    function getCliInterfaceName(interfaceObj) {
-      if (!interfaceObj) return "-";
-
-      if (interfaceObj.cliName) {
-        return interfaceObj.cliName;
+        return '-';
       }
 
-      const portOnly =
-        `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
-
-      if (interfaceObj.type === "GE") {
-        return `GigabitEthernet ${portOnly}`;
+      function extractTicket(text) {
+        const match = text.match(/JB\d+-\d+/i);
+        return match ? match[0] : '-';
       }
 
-      if (interfaceObj.type === "GigabitEthernet") {
-        return `GigabitEthernet ${portOnly}`;
+      function extractSeverity(text) {
+        const match = text.match(/\b(Critical|Major|Minor)\b/i);
+        return match ? match[1] : 'Unknown';
       }
 
-      if (
-        interfaceObj.type === "10GE" ||
-        interfaceObj.type === "25GE" ||
-        interfaceObj.type === "40GE" ||
-        interfaceObj.type === "100GE"
-      ) {
-        return `${interfaceObj.type} ${portOnly}`;
+      function extractService(text) {
+        if (/Service Degraded/i.test(text)) return 'Service Degraded';
+        if (/Service Unaffected/i.test(text)) return 'Service Unaffected';
+        if (/Service Interrupted/i.test(text)) return 'Service Interrupted';
+        return '-';
       }
 
-      return interfaceObj.fullName;
-    }
-
-    function cleanDeviceName(deviceName) {
-      if (!deviceName || deviceName === "-") {
-        return "-";
+      function extractJobType(text) {
+        if (/CRC/i.test(text)) return 'CRC ERROR';
+        if (/LINK DOWN/i.test(text)) return 'LINK DOWN';
+        if (/\bLOS\b/i.test(text)) return 'LOS';
+        if (/CPU/i.test(text)) return 'CPU HIGH';
+        if (/POWER|ไฟดับ/i.test(text)) return 'POWER ALARM';
+        if (/TEMP|TEMPERATURE/i.test(text)) return 'TEMPERATURE ALARM';
+        return 'UNKNOWN';
       }
 
-      return deviceName.replace(/\([A-Z]+\)/gi, "");
-    }
+      function detectOltModel(text) {
+        if (/MA5608T/i.test(text)) return 'MA5608T';
+        if (/MA5800/i.test(text)) return 'MA5800';
+        return 'UNKNOWN';
+      }
 
-    function buildRemoteAccess(localDevice, peerDevice, mode) {
-      const cleanLocalDevice = cleanDeviceName(localDevice);
-      const cleanPeerDevice = cleanDeviceName(peerDevice);
+      function getCliInterfaceName(interfaceObj) {
+        if (!interfaceObj) return '-';
 
-      if (mode === "OLT") {
-        return `========================================
+        if (interfaceObj.cliName) {
+          return interfaceObj.cliName;
+        }
+
+        const portOnly = `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
+
+        if (interfaceObj.type === 'GE') {
+          return `GigabitEthernet ${portOnly}`;
+        }
+
+        if (interfaceObj.type === 'GigabitEthernet') {
+          return `GigabitEthernet ${portOnly}`;
+        }
+
+        if (
+          interfaceObj.type === '10GE' ||
+          interfaceObj.type === '25GE' ||
+          interfaceObj.type === '40GE' ||
+          interfaceObj.type === '100GE'
+        ) {
+          return `${interfaceObj.type} ${portOnly}`;
+        }
+
+        return interfaceObj.fullName;
+      }
+
+      function cleanDeviceName(deviceName) {
+        if (!deviceName || deviceName === '-') {
+          return '-';
+        }
+
+        return deviceName.replace(/\([A-Z]+\)/gi, '');
+      }
+
+      function buildRemoteAccess(localDevice, peerDevice, mode) {
+        const cleanLocalDevice = cleanDeviceName(localDevice);
+        const cleanPeerDevice = cleanDeviceName(peerDevice);
+
+        if (mode === 'OLT') {
+          return `========================================
 REMOTE ACCESS
 ========================================
 
@@ -461,9 +463,9 @@ config
 # หมายเหตุ
 # เปลี่ยน [OLT-NAME] เป็นชื่อ OLT จริงจาก Job หรือระบบ Monitor
 `;
-      }
+        }
 
-      return `========================================
+        return `========================================
 REMOTE ACCESS
 ========================================
 
@@ -481,22 +483,21 @@ ssh username@${cleanLocalDevice}
 # หากชื่อ Peer มีวงเล็บ เช่น ME-3701-101(MDH)
 # ระบบจะตัดเหลือ ME-3701-101 สำหรับใช้ SSH
 `;
-    }
-
-    function buildInterfaceDiscovery(localInterface, peerPort) {
-      let portOnly = "-";
-
-      if (localInterface && localInterface.frame) {
-        portOnly =
-          `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
-      } else if (peerPort && peerPort !== "-") {
-        portOnly = peerPort.replace(
-          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
-          ""
-        );
       }
 
-      return `========================================
+      function buildInterfaceDiscovery(localInterface, peerPort) {
+        let portOnly = '-';
+
+        if (localInterface && localInterface.frame) {
+          portOnly = `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
+        } else if (peerPort && peerPort !== '-') {
+          portOnly = peerPort.replace(
+            /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
+            ''
+          );
+        }
+
+        return `========================================
 INTERFACE DISCOVERY
 ========================================
 
@@ -516,15 +517,15 @@ display interface description | include ${portOnly}
 - เลข 0/5/2 ใน Description อาจเป็น Port ฝั่งปลายทาง
 - ให้ยึด Interface คอลัมน์แรกจากผล display interface description เป็นหลัก
 `;
-    }
+      }
 
-    function buildMeCommands(localInterface, jobType) {
-      let commands = "";
+      function buildMeCommands(localInterface, jobType) {
+        let commands = '';
 
-      if (localInterface && localInterface.fullName) {
-        const ifName = getCliInterfaceName(localInterface);
+        if (localInterface && localInterface.fullName) {
+          const ifName = getCliInterfaceName(localInterface);
 
-        commands += `# Interface
+          commands += `# Interface
 display interface ${ifName}
 
 # Config ของ Port
@@ -536,9 +537,9 @@ display current-configuration interface ${ifName}
 display interface ${ifName}
 
 `;
-      }
+        }
 
-      commands += `# LLDP
+        commands += `# LLDP
 display lldp neighbor brief
 
 # Alarm
@@ -551,8 +552,8 @@ display logbuffer
 display interface description
 `;
 
-      if (jobType === "CPU HIGH") {
-        commands += `
+        if (jobType === 'CPU HIGH') {
+          commands += `
 # CPU
 display cpu-usage
 
@@ -562,15 +563,15 @@ display memory-usage
 # Version / Uptime
 display version
 `;
+        }
+
+        return commands;
       }
 
-      return commands;
-    }
+      function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
+        let commands = '';
 
-    function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
-      let commands = "";
-
-      commands += `# ตรวจสอบ Board / Card
+        commands += `# ตรวจสอบ Board / Card
 display board 0/[slot]
 
 # ตรวจสอบ LLDP / ปลายทาง
@@ -588,43 +589,43 @@ display power run info
 
 `;
 
-      if (localInterface && localInterface.fullName) {
-        const ifName = getCliInterfaceName(localInterface);
+        if (localInterface && localInterface.fullName) {
+          const ifName = getCliInterfaceName(localInterface);
 
-        commands += `# ตรวจสอบ Uplink Interface
+          commands += `# ตรวจสอบ Uplink Interface
 display interface ${ifName}
 
 # ตรวจสอบ Config Uplink
 display current-configuration interface ${ifName}
 
 `;
-      }
+        }
 
-      if (localInterface && localInterface.slot && localInterface.port) {
-        commands += buildOltSlotPortCommands(
-          localInterface.slot,
-          localInterface.port,
-          oltModel
-        );
-      }
+        if (localInterface && localInterface.slot && localInterface.port) {
+          commands += buildOltSlotPortCommands(
+            localInterface.slot,
+            localInterface.port,
+            oltModel
+          );
+        }
 
-      if (gponPorts.length > 0) {
-        gponPorts.forEach(function (gpon) {
-          commands += `# ตรวจสอบ GPON Port
+        if (gponPorts.length > 0) {
+          gponPorts.forEach(function (gpon) {
+            commands += `# ตรวจสอบ GPON Port
 # ${gpon.fullName}
 
 display board 0/${gpon.slot}
 
 `;
-        });
+          });
+        }
+
+        return commands;
       }
 
-      return commands;
-    }
-
-    function buildOltSlotPortCommands(slot, port, oltModel) {
-      if (oltModel === "MA5608T") {
-        return `# MA5608T - เข้า Control Card
+      function buildOltSlotPortCommands(slot, port, oltModel) {
+        if (oltModel === 'MA5608T') {
+          return `# MA5608T - เข้า Control Card
 interface mcu 0/${slot}
 
 # เช็คค่าแสง
@@ -634,10 +635,10 @@ display port ddm-info ${port}
 display port statistics ${port}
 
 `;
-      }
+        }
 
-      if (oltModel === "MA5800") {
-        return `# MA5800 - เข้า Control Card
+        if (oltModel === 'MA5800') {
+          return `# MA5800 - เข้า Control Card
 interface mpu 0/${slot}
 
 # เช็คค่าแสง
@@ -647,9 +648,9 @@ display port ddm-info ${port}
 display port statistics ${port}
 
 `;
-      }
+        }
 
-      return `# ถ้าเป็น MA5608T
+        return `# ถ้าเป็น MA5608T
 interface mcu 0/${slot}
 display port ddm-info ${port}
 display port statistics ${port}
@@ -660,11 +661,11 @@ display port ddm-info ${port}
 display port statistics ${port}
 
 `;
-    }
+      }
 
-    function buildWhatToCheck(localPort, jobType, mode) {
-      if (mode === "OLT") {
-        return `========================================
+      function buildWhatToCheck(localPort, jobType, mode) {
+        if (mode === 'OLT') {
+          return `========================================
 WHAT TO CHECK
 ========================================
 
@@ -692,9 +693,9 @@ interface emu 1
 display power run info
 - ใช้เช็คไฟดับ / Power Module / AC Fail
 `;
-      }
+        }
 
-      return `========================================
+        return `========================================
 WHAT TO CHECK
 ========================================
 
@@ -721,11 +722,11 @@ display alarm active
 display logbuffer
 - ดูประวัติ Link Up/Down หรือ CRC Alarm ย้อนหลัง
 `;
-    }
+      }
 
-    function buildJobMethod(localPort, jobType, mode) {
-      if (jobType === "CRC ERROR") {
-        return `========================================
+      function buildJobMethod(localPort, jobType, mode) {
+        if (jobType === 'CRC ERROR') {
+          return `========================================
 CRC CHECK METHOD
 ========================================
 
@@ -748,10 +749,10 @@ display interface ${localPort}
 - อาจเป็น Alarm เก่าหรือปัญหาหายแล้ว
 - Monitor ต่อเพิ่มเติม
 `;
-      }
+        }
 
-      if (jobType === "LINK DOWN" || jobType === "LOS") {
-        return `========================================
+        if (jobType === 'LINK DOWN' || jobType === 'LOS') {
+          return `========================================
 LINK DOWN / LOS CHECK METHOD
 ========================================
 
@@ -776,11 +777,11 @@ display logbuffer
 ถ้า Interface Down แต่ไม่มี Optical Alarm:
 - ตรวจสอบ Config / Shutdown / Remote Port
 `;
-      }
+        }
 
-      if (jobType === "POWER ALARM") {
-        if (mode === "OLT") {
-          return `========================================
+        if (jobType === 'POWER ALARM') {
+          if (mode === 'OLT') {
+            return `========================================
 POWER CHECK METHOD
 ========================================
 
@@ -801,9 +802,9 @@ display logbuffer
 - ตรวจสอบ Power Module
 - ประสานทีม Site / Facility
 `;
-        }
+          }
 
-        return `========================================
+          return `========================================
 POWER CHECK METHOD
 ========================================
 
@@ -821,10 +822,10 @@ display version
 - ตรวจสอบ PSU / Power Module
 - ประสานทีม Site / Facility
 `;
-      }
+        }
 
-      if (jobType === "CPU HIGH") {
-        return `========================================
+        if (jobType === 'CPU HIGH') {
+          return `========================================
 CPU CHECK METHOD
 ========================================
 
@@ -846,9 +847,9 @@ display logbuffer
 - Traffic ผิดปกติ
 - Process ผิดปกติ
 `;
-      }
+        }
 
-      return `========================================
+        return `========================================
 GENERAL CHECK METHOD
 ========================================
 
@@ -858,12 +859,12 @@ GENERAL CHECK METHOD
 4. ตรวจสอบ Description / Config
 5. วิเคราะห์ร่วมกับข้อมูลจาก Ticket
 `;
-    }
+      }
 
-    function buildRecommendation(jobType, mode) {
-      if (mode === "OLT") {
-        if (jobType === "CRC ERROR") {
-          return `Priority Check OLT
+      function buildRecommendation(jobType, mode) {
+        if (mode === 'OLT') {
+          if (jobType === 'CRC ERROR') {
+            return `Priority Check OLT
 
 1. ตรวจสอบ Board / Card
 2. ตรวจสอบ Port Statistics
@@ -880,10 +881,10 @@ Possible Cause
 - SFP / Module
 - Uplink Port Error
 `;
-        }
+          }
 
-        if (jobType === "LINK DOWN" || jobType === "LOS") {
-          return `Priority Check OLT
+          if (jobType === 'LINK DOWN' || jobType === 'LOS') {
+            return `Priority Check OLT
 
 1. ตรวจสอบ Port Down จริงหรือไม่
 2. ตรวจสอบค่าแสง DDM
@@ -900,10 +901,10 @@ Possible Cause
 - Power Problem
 - Board / Card Problem
 `;
-        }
+          }
 
-        if (jobType === "POWER ALARM") {
-          return `Priority Check OLT
+          if (jobType === 'POWER ALARM') {
+            return `Priority Check OLT
 
 1. interface emu 1
 2. display power run info
@@ -917,9 +918,9 @@ Possible Cause
 - Power Module Fail
 - Site Power Problem
 `;
-        }
+          }
 
-        return `Priority Check OLT
+          return `Priority Check OLT
 
 1. display board 0/[slot]
 2. display alarm active
@@ -928,10 +929,10 @@ Possible Cause
 5. interface emu 1
 6. display power run info
 `;
-      }
+        }
 
-      if (jobType === "CRC ERROR") {
-        return `Priority Check ME
+        if (jobType === 'CRC ERROR') {
+          return `Priority Check ME
 
 1. Link Status
 2. RX/TX Power
@@ -953,10 +954,10 @@ Impact
 - Packet Loss
 - Latency Increase
 `;
-      }
+        }
 
-      if (jobType === "LINK DOWN" || jobType === "LOS") {
-        return `Priority Check ME
+        if (jobType === 'LINK DOWN' || jobType === 'LOS') {
+          return `Priority Check ME
 
 1. Interface Status
 2. Optical Power
@@ -972,10 +973,10 @@ Possible Cause
 - Device Reboot
 - Power Failure
 `;
-      }
+        }
 
-      if (jobType === "POWER ALARM") {
-        return `Priority Check ME
+        if (jobType === 'POWER ALARM') {
+          return `Priority Check ME
 
 1. display alarm active
 2. display logbuffer
@@ -988,10 +989,10 @@ Possible Cause
 - Site Power
 - Device Reboot
 `;
-      }
+        }
 
-      if (jobType === "CPU HIGH") {
-        return `Priority Check ME
+        if (jobType === 'CPU HIGH') {
+          return `Priority Check ME
 
 1. CPU Usage
 2. Memory Usage
@@ -1006,9 +1007,9 @@ Possible Cause
 - High Traffic
 - Process Abnormal
 `;
-      }
+        }
 
-      return `Priority Check
+        return `Priority Check
 
 1. Alarm
 2. Log
@@ -1019,10 +1020,10 @@ Possible Cause
 
 - Need manual analysis
 `;
-    }
+      }
 
-    function buildValueGuide(jobType) {
-      return `========================================
+      function buildValueGuide(jobType) {
+        return `========================================
 VALUE GUIDE
 ========================================
 
@@ -1047,10 +1048,10 @@ Alarm
 - Active Alarm = ปัญหายังเกิดอยู่
 - Cleared Alarm = อาจเป็นเหตุการณ์ย้อนหลัง ต้องดู Log ประกอบ
 `;
-    }
+      }
 
-    function buildEscalation(jobType, mode) {
-      return `========================================
+      function buildEscalation(jobType, mode) {
+        return `========================================
 ESCALATION
 ========================================
 
@@ -1073,10 +1074,10 @@ ESCALATION
 - พบไฟดับ
 - พบอุปกรณ์ Reboot หรือ Uptime ผิดปกติ
 `;
-    }
+      }
 
-    function buildSafetyNote() {
-      return `========================================
+      function buildSafetyNote() {
+        return `========================================
 SAFETY NOTE
 ========================================
 
@@ -1097,35 +1098,35 @@ display lldp neighbor brief
 หมายเหตุ:
 คำสั่ง shutdown / undo shutdown อาจกระทบลูกค้าหรือวงจรจำนวนมากได้
 `;
-    }
-
-    function buildPortBounce(localInterface, mode, oltModel) {
-      if (!localInterface || !localInterface.fullName) {
-        return "ไม่พบ Local Port จึงยังไม่แนะนำคำสั่ง shutdown / undo shutdown";
       }
 
-      if (mode === "OLT") {
-        if (oltModel === "MA5608T") {
-          return `# ตรวจสอบ Topology ก่อนทุกครั้ง
+      function buildPortBounce(localInterface, mode, oltModel) {
+        if (!localInterface || !localInterface.fullName) {
+          return 'ไม่พบ Local Port จึงยังไม่แนะนำคำสั่ง shutdown / undo shutdown';
+        }
+
+        if (mode === 'OLT') {
+          if (oltModel === 'MA5608T') {
+            return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
 interface mcu 0/${localInterface.slot}
 
 shutdown ${localInterface.port}
 
 undo shutdown ${localInterface.port}`;
-        }
+          }
 
-        if (oltModel === "MA5800") {
-          return `# ตรวจสอบ Topology ก่อนทุกครั้ง
+          if (oltModel === 'MA5800') {
+            return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
 interface mpu 0/${localInterface.slot}
 
 shutdown ${localInterface.port}
 
 undo shutdown ${localInterface.port}`;
-        }
+          }
 
-        return `# ตรวจสอบ Topology ก่อนทุกครั้ง
+          return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
 # ถ้าเป็น MA5608T
 interface mcu 0/${localInterface.slot}
@@ -1136,9 +1137,9 @@ undo shutdown ${localInterface.port}
 interface mpu 0/${localInterface.slot}
 shutdown ${localInterface.port}
 undo shutdown ${localInterface.port}`;
-      }
+        }
 
-      return `# ตรวจสอบ Topology ก่อนทุกครั้ง
+        return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
 system-view
 
@@ -1147,83 +1148,103 @@ interface ${getCliInterfaceName(localInterface)}
 shutdown
 
 undo shutdown`;
-    }
+      }
 
-    function analyzeJob(mode) {
-      const resultBox = document.getElementById("result");
+      function analyzeJob(mode) {
+        const resultBox = document.getElementById('result');
 
-      try {
-        const text = cleanText(document.getElementById("jobInput").value);
+        try {
+          const text = cleanText(document.getElementById('jobInput').value);
+          const titleLinksSummary = buildTitleLinksSummary(titleLinks);
+          if (!text.trim()) {
+            alert('กรุณาวาง Job Ticket');
+            return;
+          }
 
-        if (!text.trim()) {
-          alert("กรุณาวาง Job Ticket");
-          return;
-        }
+          const ticket = extractTicket(text);
+          const severity = extractSeverity(text);
+          const service = extractService(text);
+          const jobType = extractJobType(text);
+          const oltModel = detectOltModel(text);
 
-        const ticket = extractTicket(text);
-        const severity = extractSeverity(text);
-        const service = extractService(text);
-        const jobType = extractJobType(text);
-        const oltModel = detectOltModel(text);
+          const titleLinks = extractTitleLinks(text);
+          const firstTitleLink = titleLinks[0] || null;
 
-        const devices = extractDevices(text);
-        const localDevice = devices[0] || "-";
-        const peerDevice = devices[1] || "-";
+          const devices = extractDevices(text);
 
-        const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
+          const localDevice = firstTitleLink
+            ? firstTitleLink.localDevice
+            : devices[0] || '-';
 
-        const discoveredInterfaces = extractInterfacesFromDescription(text);
+          const peerDevice = firstTitleLink
+            ? firstTitleLink.peerDevice
+            : devices[1] || '-';
 
-        const physicalInterfaces =
-          discoveredInterfaces.length > 0
-            ? discoveredInterfaces
-            : extractInterfaces(text);
+          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
 
-        const gponPorts = extractGponPorts(text);
+          const discoveredInterfaces = extractInterfacesFromDescription(text);
 
-        const localInterface = physicalInterfaces[0] || null;
-        const peerInterface = physicalInterfaces[1] || null;
+          let physicalInterfaces = [];
 
-        const localPort = localInterface ? localInterface.fullName : "-";
+          if (discoveredInterfaces.length > 0) {
+            physicalInterfaces = discoveredInterfaces;
+          } else if (firstTitleLink) {
+            physicalInterfaces = [
+              firstTitleLink.localInterface,
+              firstTitleLink.peerInterface,
+            ].filter(Boolean);
+          } else {
+            physicalInterfaces = extractInterfaces(text);
+          }
 
-        const cliLocalPort = localInterface
-          ? getCliInterfaceName(localInterface)
-          : "-";
+          const gponPorts = extractGponPorts(text);
 
-        let peerPort = peerInterface ? peerInterface.fullName : "-";
+          const localInterface = physicalInterfaces[0] || null;
+          const peerInterface = physicalInterfaces[1] || null;
 
-        if (peerPort === "-") {
-          peerPort = extractPeerPortFromLink(text);
-        }
+          const localPort = localInterface ? localInterface.fullName : '-';
 
-        let commands = "";
+          const cliLocalPort = localInterface
+            ? getCliInterfaceName(localInterface)
+            : '-';
 
-        if (mode === "OLT") {
-          commands = buildOltCommands(
+          let peerPort = peerInterface ? peerInterface.fullName : '-';
+
+          if (peerPort === '-') {
+            peerPort = extractPeerPortFromLink(text);
+          }
+
+          let commands = '';
+
+          if (mode === 'OLT') {
+            commands = buildOltCommands(
+              localInterface,
+              gponPorts,
+              jobType,
+              oltModel
+            );
+          } else {
+            commands = buildMeCommands(localInterface, jobType);
+          }
+
+          const interfaceDiscovery = buildInterfaceDiscovery(
             localInterface,
-            gponPorts,
-            jobType,
-            oltModel
+            peerPort
           );
-        } else {
-          commands = buildMeCommands(localInterface, jobType);
-        }
+          const recommendation = buildRecommendation(jobType, mode);
+          const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
+          const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
+          const valueGuide = buildValueGuide(jobType);
+          const escalation = buildEscalation(jobType, mode);
+          const portBounce = buildPortBounce(localInterface, mode, oltModel);
+          const safetyNote = buildSafetyNote();
 
-        const interfaceDiscovery = buildInterfaceDiscovery(localInterface, peerPort);
-        const recommendation = buildRecommendation(jobType, mode);
-        const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
-        const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
-        const valueGuide = buildValueGuide(jobType);
-        const escalation = buildEscalation(jobType, mode);
-        const portBounce = buildPortBounce(localInterface, mode, oltModel);
-        const safetyNote = buildSafetyNote();
-
-        const output = `========================================
+          const output = `========================================
 JOB ANALYSIS
 ========================================
 
 ASSISTANT :
-Huawei ${mode === "OLT" ? "OLT" : "NOC_ME"} Assistant
+Huawei ${mode === 'OLT' ? 'OLT' : 'NOC_ME'} Assistant
 
 TICKET :
 ${ticket}
@@ -1238,7 +1259,7 @@ NETWORK TYPE :
 ${mode}
 
 OLT MODEL :
-${mode === "OLT" ? oltModel : "-"}
+${mode === 'OLT' ? oltModel : '-'}
 
 JOB TYPE :
 ${jobType}
@@ -1291,20 +1312,131 @@ ${portBounce}
 ${safetyNote}
 `;
 
-        resultBox.value = cleanOutputText(output);
-      } catch (error) {
-        resultBox.value =
-          "เกิดข้อผิดพลาดใน JavaScript:\n\n" +
-          error.message +
-          "\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt; หรือ &gt; ปนอยู่ในโค้ด";
-        console.error(error);
+          resultBox.value = cleanOutputText(output);
+        } catch (error) {
+          resultBox.value =
+            'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
+            error.message +
+            '\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt; หรือ &gt; ปนอยู่ในโค้ด';
+          console.error(error);
+        }
       }
-    }
+      function parseInterfaceToken(token, defaultType) {
+        if (!token) return null;
 
-    function clearAll() {
-      document.getElementById("jobInput").value = "";
-      document.getElementById("result").value = "";
-    }
-  </script>
-</body>
+        const cleanToken = String(token).trim();
+
+        const match = cleanToken.match(
+          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\s*(\d+)\d+\d+$/i
+        );
+
+        if (!match) return null;
+
+        let type = match[1] || defaultType || 'GigabitEthernet';
+
+        if (/^GE$/i.test(type)) {
+          type = 'GigabitEthernet';
+        }
+
+        if (/^GigabitEthernet$/i.test(type)) {
+          type = 'GigabitEthernet';
+        }
+
+        const frame = match[2];
+        const slot = match[3];
+        const port = match[4];
+
+        return {
+          type: type,
+          frame: frame,
+          slot: slot,
+          port: port,
+          fullName: `${type} ${frame}/${slot}/${port}`,
+          cliName: `${type} ${frame}/${slot}/${port}`,
+        };
+      }
+
+      function extractTitleLinks(text) {
+        const links = [];
+
+        /*
+    รองรับรูปแบบ:
+    [1].ME-3802-48_0/2/0__-__MME-3513-31_GigabitEthernet0/5/2
+    [2].ME-3802-48_0/3/1__-__MME-3513-31_GigabitEthernet0/3/1
+  */
+
+        const regex =
+          /\[(\d+)\]\.([A-Z]+-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)__-__([A-Z]+-\d+-\d+(?:\([A-Z]+\))?)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?[0-9]+[\/_-][0-9]+[\/_-][0-9]+)/gi;
+
+        let match;
+
+        while ((match = regex.exec(text)) !== null) {
+          const index = match[1];
+
+          const localDevice = match[2];
+          const localPortRaw = match[3];
+
+          const peerDevice = match[4];
+          const peerPortRaw = match[5];
+
+          const localInterface = parseInterfaceToken(
+            localPortRaw,
+            'GigabitEthernet'
+          );
+
+          const peerInterface = parseInterfaceToken(
+            peerPortRaw,
+            'GigabitEthernet'
+          );
+
+          links.push({
+            index: index,
+            localDevice: localDevice,
+            localPortRaw: localPortRaw,
+            localInterface: localInterface,
+            peerDevice: peerDevice,
+            peerPortRaw: peerPortRaw,
+            peerInterface: peerInterface,
+          });
+        }
+
+        return links;
+      }
+
+      function buildTitleLinksSummary(titleLinks) {
+        if (!titleLinks || titleLinks.length === 0) {
+          return '';
+        }
+
+        let summary = `========================================
+TITLE LINK LIST
+========================================
+
+`;
+
+        titleLinks.forEach(function (link) {
+          summary += `[${link.index}]
+LOCAL :
+${link.localDevice} ${
+            link.localInterface
+              ? link.localInterface.fullName
+              : link.localPortRaw
+          }
+
+PEER :
+${link.peerDevice} ${
+            link.peerInterface ? link.peerInterface.fullName : link.peerPortRaw
+          }
+
+`;
+        });
+
+        return summary;
+      }
+      function clearAll() {
+        document.getElementById('jobInput').value = '';
+        document.getElementById('result').value = '';
+      }
+    </script>
+  </body>
 </html>
