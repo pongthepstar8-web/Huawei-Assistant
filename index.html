@@ -1155,7 +1155,7 @@ undo shutdown`;
 
         try {
           const text = cleanText(document.getElementById('jobInput').value);
-          const titleLinksSummary = buildTitleLinksSummary(titleLinks);
+
           if (!text.trim()) {
             alert('กรุณาวาง Job Ticket');
             return;
@@ -1167,8 +1167,10 @@ undo shutdown`;
           const jobType = extractJobType(text);
           const oltModel = detectOltModel(text);
 
+          // อ่าน Title Link ก่อน
           const titleLinks = extractTitleLinks(text);
           const firstTitleLink = titleLinks[0] || null;
+          const titleLinksSummary = buildTitleLinksSummary(titleLinks);
 
           const devices = extractDevices(text);
 
@@ -1231,6 +1233,7 @@ undo shutdown`;
             localInterface,
             peerPort
           );
+
           const recommendation = buildRecommendation(jobType, mode);
           const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
           const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
@@ -1279,6 +1282,8 @@ ${peerDevice}
 PEER PORT :
 ${peerPort}
 
+${titleLinksSummary}
+
 ${remoteAccess}
 
 ${interfaceDiscovery}
@@ -1318,6 +1323,7 @@ ${safetyNote}
             'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
             error.message +
             '\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt; หรือ &gt; ปนอยู่ในโค้ด';
+
           console.error(error);
         }
       }
@@ -1327,7 +1333,7 @@ ${safetyNote}
         const cleanToken = String(token).trim();
 
         const match = cleanToken.match(
-          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\s*(\d+)\d+\d+$/i
+          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)$/i
         );
 
         if (!match) return null;
