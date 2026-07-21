@@ -199,14 +199,39 @@ JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR"
 
       checkFactoryAuth();
 
+      function decodeHtmlEntities(text) {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        return textarea.value;
+      }
+
       function cleanText(text) {
-        return String(text)
-          .replace(/<br\s*\/?>/gi, '\n')
+        let output = String(text);
+
+        // แปลง <br> แบบ escaped ก่อน
+        output = output
           .replace(/&lt;br\s*\/?&gt;/gi, '\n')
-          .replace(/&amp;lt;br&amp;gt;/gi, '\n')
+          .replace(/&amp;lt;br\s*\/?&amp;gt;/gi, '\n');
+
+        // Decode HTML entities เช่น &lt;strong&gt; ให้กลับเป็น <strong>
+        output = decodeHtmlEntities(output);
+
+        // แปลง <br> จริงหลัง decode
+        output = output.replace(/<br\s*\/?>/gi, '\n');
+
+        // ลบ tag HTML ทั้งหมด เช่น strong, span, div, p
+        output = output.replace(/<[^>]*>/g, '');
+
+        // ลบ indentation เยอะ ๆ ที่เกิดจาก template string
+        output = output.replace(/^[ \t]{6,}/gm, '');
+
+        // จัดบรรทัดว่าง
+        output = output
           .replace(/\r/g, '')
           .replace(/\n{3,}/g, '\n\n')
           .trim();
+
+        return output;
       }
 
       function cleanOutputText(text) {
