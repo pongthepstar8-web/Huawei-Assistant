@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<!-- saved from url=(0097)https://stackblitzstartersxrqemrte-0lvg-%2D8080-%2D87cf54cd.local-credentialless.webcontainer.io/ -->
-<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Huawei NOC / OLT Assistant</title>
 
     <style>
@@ -138,20 +138,23 @@
 
         <h3>📥 Job Ticket</h3>
 
-        <textarea id="jobInput" placeholder="วาง Job Ticket ที่นี่ เช่น
+        <textarea
+          id="jobInput"
+          placeholder="วาง Job Ticket ที่นี่ เช่น
 
 ME Job:
 JB26-9999999 : Service Degraded : 3BB_Metronet CRC Error -MME-3720-31 10GE0-2-1 to ME-3701-101(MDH)_link1_0/3/1_OFC-null + CRC ERROR : Minor
 
 OLT Job:
-JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR หรือ OLT Link Down MA5608T GigabitEthernet0/2/2"></textarea>
+JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR หรือ OLT Link Down MA5608T GigabitEthernet0/2/2"
+        ></textarea>
 
         <div class="buttons">
-          <button class="me" onclick="analyzeJob(&#39;ME&#39;)">
+          <button class="me" onclick="analyzeJob('ME')">
             🔧 Huawei NOC_ME Assistant
           </button>
 
-          <button class="olt" onclick="analyzeJob(&#39;OLT&#39;)">
+          <button class="olt" onclick="analyzeJob('OLT')">
             🟠 Huawei OLT Assistant
           </button>
 
@@ -165,6 +168,31 @@ JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR หรือ O
     </div>
 
     <script>
+      function checkFactoryAuth() {
+        const auth = JSON.parse(localStorage.getItem('factoryAuth'));
+
+        if (!auth) {
+          location.replace(
+            'https://pongthepstar8-web.github.io/tool-launcher/'
+          );
+          return false;
+        }
+
+        const expireTime = 8 * 60 * 60 * 1000; // 8 ชั่วโมง
+
+        if (Date.now() - auth.loginTime > expireTime) {
+          localStorage.clear();
+
+          location.replace(
+            'https://pongthepstar8-web.github.io/tool-launcher/'
+          );
+          return false;
+        }
+
+        return true;
+      }
+
+      checkFactoryAuth();
       function normalizeInterfaceType(type) {
         const upper = String(type).toUpperCase();
 
@@ -1105,14 +1133,5 @@ ${safetyNote}
         document.getElementById('result').value = '';
       }
     </script>
-  
-
-
-      <script>
-        const source = new EventSource('/livereload');
-        const reload = () => location.reload(true);
-        source.onmessage = reload;
-        source.onerror = () => (source.onopen = reload);
-        console.log('[servor] listening for file changes');
-      </script>
-    </body></html>
+  </body>
+</html>
