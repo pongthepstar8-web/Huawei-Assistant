@@ -995,7 +995,13 @@ shutdown
 
 undo shutdown`;
       }
-
+      function cleanOutputText(text) {
+        return text
+          .replace(/<br\s*\/?>/gi, '')
+          .replace(/&lt;br&gt;/gi, '')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+      }
       function analyzeJob(mode) {
         const resultBox = document.getElementById('result');
 
@@ -1090,6 +1096,8 @@ ${peerDevice}
 PEER PORT :
 ${peerPort}
 
+${remoteAccess}
+
 ========================================
 COMMANDS
 ========================================
@@ -1119,7 +1127,7 @@ ${portBounce}
 ${safetyNote}
 `;
 
-          resultBox.value = output;
+          resultBox.value = cleanOutputText(output);
         } catch (error) {
           resultBox.value =
             'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
