@@ -351,7 +351,7 @@ JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR หรือ O
         let commands = '';
 
         if (localInterface && localInterface.fullName) {
-          const ifName = buildHuaweiCliInterfaceName(localInterface);
+          const ifName = getCliInterfaceName(localInterface);
 
           commands += `# Interface
 display interface ${ifName}
@@ -974,7 +974,7 @@ undo shutdown ${localInterface.port}`;
 
 system-view
 
-interface ${buildHuaweiCliInterfaceName(localInterface)}
+interface ${getCliInterfaceName(localInterface)}
 
 shutdown
 
@@ -983,13 +983,13 @@ undo shutdown`;
       function cleanOutputText(text) {
         return text
           .replace(/<br\s*\/?>/gi, '')
-          .replace(/&lt;br&gt;/gi, '')
+          .replace(/&lt;br\s*\/?&gt;/gi, '')
           .replace(/\n{3,}/g, '\n\n')
           .trim();
       }
       function analyzeJob(mode) {
         const resultBox = document.getElementById('result');
-
+        const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
         try {
           const text = document.getElementById('jobInput').value;
 
@@ -1014,12 +1014,16 @@ undo shutdown`;
             discoveredInterfaces.length > 0
               ? discoveredInterfaces
               : extractInterfaces(text);
+
           const gponPorts = extractGponPorts(text);
 
           const localInterface = physicalInterfaces[0] || null;
           const peerInterface = physicalInterfaces[1] || null;
 
           const localPort = localInterface ? localInterface.fullName : '-';
+          const cliLocalPort = localInterface
+            ? getCliInterfaceName(localInterface)
+            : '-';
 
           let peerPort = peerInterface ? peerInterface.fullName : '-';
 
@@ -1042,8 +1046,8 @@ undo shutdown`;
 
           const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
           const recommendation = buildRecommendation(jobType, mode);
-          const whatToCheck = buildWhatToCheck(localPort, jobType, mode);
-          const jobMethod = buildJobMethod(localPort, jobType, mode);
+          const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
+          const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
           const valueGuide = buildValueGuide(jobType);
           const escalation = buildEscalation(jobType, mode);
           const portBounce = buildPortBounce(localInterface, mode, oltModel);
@@ -1212,7 +1216,6 @@ ssh username@${cleanLocalDevice}
       }
       function extractInterfacesFromDescription(text) {
         const interfaces = [];
-
         const lines = text.split(/\r?\n/);
 
         const lineRegex =
@@ -1222,27 +1225,67 @@ ssh username@${cleanLocalDevice}
           const match = line.match(lineRegex);
 
           if (match) {
-            const type = match[1];
+            const rawType = match[1];
             const portOnly = match[2];
             const speed = match[3] || '';
-
             const parts = portOnly.split('/');
 
+            let cliType = rawType;
+
+            if (rawType === 'GE') {
+              cliType = 'GigabitEthernet';
+            }
+
             interfaces.push({
-              type: type,
+              type: rawType,
+              cliType: cliType,
               frame: parts[0],
               slot: parts[1],
               port: parts[2],
               speed: speed,
 
+              // ใช้แสดงผล
               fullName: speed
-                ? `${type}${portOnly}(${speed})`
-                : `${type}${portOnly}`,
+                ? `${rawType}${portOnly}(${speed})`
+                : `${rawType}${portOnly}`,
+
+              // ใช้สั่ง CLI จริง
+              cliName: `${cliType} ${portOnly}`,
             });
           }
         });
 
         return removeDuplicate(interfaces);
+      }
+      function getCliInterfaceName(interfaceObj) {
+        if (!interfaceObj) {
+          return '-';
+        }
+
+        if (interfaceObj.cliName) {
+          return interfaceObj.cliName;
+        }
+
+        const portOnly = `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
+
+        if (interfaceObj.type === 'GE') {
+          return `GigabitEthernet ${portOnly}`;
+        }
+
+        if (interfaceObj.type === 'GigabitEthernet') {
+          return `GigabitEthernet ${portOnly}`;
+        }
+
+        if (
+          interfaceObj.type === '10GE' ||
+          interfaceObj.type === '25GE' ||
+          interfaceObj.type === '40GE' ||
+          interfaceObj.type === '100GE'
+        ) {
+          return `${interfaceObj.type} ${portOnly}`;
+        }
+
+        return interfaceObj.fullName;
       }
     </script>
   </body>
