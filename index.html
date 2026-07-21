@@ -989,7 +989,7 @@ undo shutdown`;
       }
       function analyzeJob(mode) {
         const resultBox = document.getElementById('result');
-        const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
+
         try {
           const text = document.getElementById('jobInput').value;
 
@@ -1008,6 +1008,8 @@ undo shutdown`;
           const localDevice = devices[0] || '-';
           const peerDevice = devices[1] || '-';
 
+          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
+
           const discoveredInterfaces = extractInterfacesFromDescription(text);
 
           const physicalInterfaces =
@@ -1021,6 +1023,7 @@ undo shutdown`;
           const peerInterface = physicalInterfaces[1] || null;
 
           const localPort = localInterface ? localInterface.fullName : '-';
+
           const cliLocalPort = localInterface
             ? getCliInterfaceName(localInterface)
             : '-';
@@ -1044,7 +1047,6 @@ undo shutdown`;
             commands = buildMeCommands(localInterface, jobType);
           }
 
-          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
           const recommendation = buildRecommendation(jobType, mode);
           const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
           const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
@@ -1083,6 +1085,9 @@ ${localDevice}
 
 LOCAL PORT :
 ${localPort}
+
+CLI LOCAL PORT :
+${cliLocalPort}
 
 PEER DEVICE :
 ${peerDevice}
@@ -1126,7 +1131,7 @@ ${safetyNote}
           resultBox.value =
             'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
             error.message +
-            '\n\nกรุณาตรวจสอบว่าไม่มี <br> ปนอยู่ในโค้ด';
+            '\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt; หรือ &gt; ปนอยู่ในโค้ด';
           console.error(error);
         }
       }
