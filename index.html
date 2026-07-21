@@ -1,773 +1,869 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Huawei NOC / OLT Assistant</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Huawei NOC / OLT Assistant</title>
 
-    <style>
-      body {
-        font-family: 'Segoe UI', sans-serif;
-        background: #f4f6f9;
-        padding: 20px;
-        margin: 0;
-      }
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6f9;
+      padding: 20px;
+      margin: 0;
+    }
 
-      .container {
-        max-width: 1200px;
-        margin: auto;
-      }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
 
-      .card {
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
+    .card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-      h1 {
-        text-align: center;
-        color: #1976d2;
-      }
+    h1 {
+      text-align: center;
+      color: #1976d2;
+    }
 
-      h3 {
-        color: #222;
-      }
+    h3 {
+      color: #222;
+    }
 
-      textarea {
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 12px;
-        box-sizing: border-box;
-        font-size: 14px;
-        line-height: 1.5;
-        resize: vertical;
-      }
+    textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      box-sizing: border-box;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+    }
 
-      #jobInput {
-        min-height: 220px;
-      }
+    #jobInput {
+      min-height: 220px;
+    }
 
-      #result {
-        min-height: 780px;
-        white-space: pre;
-      }
+    #result {
+      min-height: 780px;
+      white-space: pre;
+    }
 
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    button {
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.25s ease;
+    }
+
+    .me {
+      background: linear-gradient(135deg, #2196f3, #0d47a1);
+    }
+
+    .olt {
+      background: linear-gradient(135deg, #ff9800, #e65100);
+    }
+
+    .clear {
+      background: linear-gradient(135deg, #f44336, #b71c1c);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+      opacity: 0.95;
+      padding-right: 42px;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button::after {
+      position: absolute;
+      right: 18px;
+      opacity: 0;
+      transform: translateX(12px);
+      transition: all 0.25s ease;
+    }
+
+    .me::after {
+      content: "🌐";
+    }
+
+    .olt::after {
+      content: "🟠";
+    }
+
+    .clear::after {
+      content: "🧹";
+    }
+
+    button:hover::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
       .buttons {
-        display: flex;
-        gap: 10px;
-        margin: 15px 0;
+        flex-direction: column;
       }
+    }
+  </style>
+</head>
 
-      button {
-        position: relative;
-        overflow: hidden;
-        flex: 1;
-        border: none;
-        border-radius: 8px;
-        padding: 12px;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 15px;
-        transition: all 0.25s ease;
-      }
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🔧 Huawei Assistant</h1>
 
-      .me {
-        background: linear-gradient(135deg, #2196f3, #0d47a1);
-      }
+      <h3>📥 Job Ticket</h3>
 
-      .olt {
-        background: linear-gradient(135deg, #ff9800, #e65100);
-      }
-
-      .clear {
-        background: linear-gradient(135deg, #f44336, #b71c1c);
-      }
-
-      button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-        opacity: 0.95;
-        padding-right: 42px;
-      }
-
-      button:active {
-        transform: translateY(0);
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-      }
-
-      button::after {
-        position: absolute;
-        right: 18px;
-        opacity: 0;
-        transform: translateX(12px);
-        transition: all 0.25s ease;
-      }
-
-      .me::after {
-        content: '🌐';
-      }
-
-      .olt::after {
-        content: '🟠';
-      }
-
-      .clear::after {
-        content: '🧹';
-      }
-
-      button:hover::after {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      @media (max-width: 768px) {
-        .buttons {
-          flex-direction: column;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class="card">
-        <h1>🔧 Huawei Assistant</h1>
-
-        <h3>📥 Job Ticket</h3>
-
-        <textarea
-          id="jobInput"
-          placeholder="วาง Job Ticket ที่นี่ เช่น
+      <textarea
+        id="jobInput"
+        placeholder="วาง Job Ticket ที่นี่ เช่น
 
 ME Job:
 JB26-9999999 : Service Degraded : 3BB_Metronet CRC Error -MME-3720-31 10GE0-2-1 to ME-3701-101(MDH)_link1_0/3/1_OFC-null + CRC ERROR : Minor
 
+หรือวางผลจากคำสั่ง:
+display interface description | include 0/5/2
+
+ตัวอย่าง:
+GE0/2/0(10G)    up    up    MME-3513-31(BKN)_link2_0/5/2_OFC
+
 OLT Job:
-JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR หรือ OLT Link Down MA5608T GigabitEthernet0/2/2"
-        ></textarea>
+JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR"
+      ></textarea>
 
-        <div class="buttons">
-          <button class="me" onclick="analyzeJob('ME')">
-            🔧 Huawei NOC_ME Assistant
-          </button>
+      <div class="buttons">
+        <button class="me" onclick="analyzeJob('ME')">
+          🔧 Huawei NOC_ME Assistant
+        </button>
 
-          <button class="olt" onclick="analyzeJob('OLT')">
-            🟠 Huawei OLT Assistant
-          </button>
+        <button class="olt" onclick="analyzeJob('OLT')">
+          🟠 Huawei OLT Assistant
+        </button>
 
-          <button class="clear" onclick="clearAll()">🗑 Clear</button>
-        </div>
-
-        <h3>📄 Result</h3>
-
-        <textarea id="result"></textarea>
+        <button class="clear" onclick="clearAll()">
+          🗑 Clear
+        </button>
       </div>
+
+      <h3>📄 Result</h3>
+
+      <textarea id="result"></textarea>
     </div>
+  </div>
 
-    <script>
-      function checkFactoryAuth() {
-        const auth = JSON.parse(localStorage.getItem('factoryAuth'));
+  <script>
+    function checkFactoryAuth() {
+      const auth = JSON.parse(localStorage.getItem("factoryAuth"));
 
-        if (!auth) {
-          location.replace(
-            'https://pongthepstar8-web.github.io/tool-launcher/'
-          );
-          return false;
-        }
-
-        const expireTime = 8 * 60 * 60 * 1000; // 8 ชั่วโมง
-
-        if (Date.now() - auth.loginTime > expireTime) {
-          localStorage.clear();
-
-          location.replace(
-            'https://pongthepstar8-web.github.io/tool-launcher/'
-          );
-          return false;
-        }
-
-        return true;
+      if (!auth) {
+        location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
+        return false;
       }
 
-      checkFactoryAuth();
-      function normalizeInterfaceType(type) {
-        const upper = String(type).toUpperCase();
+      const expireTime = 8 * 60 * 60 * 1000;
 
-        if (upper === 'GE') return 'GigabitEthernet';
-        if (upper === 'GIGABITETHERNET') return 'GigabitEthernet';
-        if (upper === '10GE') return '10GE';
-        if (upper === '25GE') return '25GE';
-        if (upper === '40GE') return '40GE';
-        if (upper === '100GE') return '100GE';
-
-        return type;
+      if (Date.now() - auth.loginTime > expireTime) {
+        localStorage.clear();
+        location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
+        return false;
       }
 
-      function removeDuplicate(items) {
-        const map = new Map();
+      return true;
+    }
 
-        items.forEach(function (item) {
-          map.set(item.fullName, item);
+    checkFactoryAuth();
+
+    function cleanText(text) {
+      return String(text)
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/&lt;br\s*\/?&gt;/gi, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function cleanOutputText(text) {
+      return cleanText(text);
+    }
+
+    function normalizeInterfaceType(type) {
+      const upper = String(type).toUpperCase();
+
+      if (upper === "GE") return "GigabitEthernet";
+      if (upper === "GIGABITETHERNET") return "GigabitEthernet";
+      if (upper === "10GE") return "10GE";
+      if (upper === "25GE") return "25GE";
+      if (upper === "40GE") return "40GE";
+      if (upper === "100GE") return "100GE";
+
+      return type;
+    }
+
+    function removeDuplicate(items) {
+      const map = new Map();
+
+      items.forEach(function (item) {
+        map.set(item.fullName, item);
+      });
+
+      return Array.from(map.values());
+    }
+
+    function extractInterfaces(text) {
+      const interfaces = [];
+
+      const interfaceRegex =
+        /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
+
+      let match;
+
+      while ((match = interfaceRegex.exec(text)) !== null) {
+        const type = normalizeInterfaceType(match[1]);
+        const frame = match[2];
+        const slot = match[3];
+        const port = match[4];
+
+        interfaces.push({
+          type,
+          frame,
+          slot,
+          port,
+          fullName: `${type} ${frame}/${slot}/${port}`,
+          cliName: `${type} ${frame}/${slot}/${port}`
         });
-
-        return Array.from(map.values());
       }
 
-      function extractInterfaces(text) {
-        const interfaces = [];
+      const trunkRegex = /Eth-Trunk\s*(\d+)/gi;
 
-        const interfaceRegex =
-          /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
+      while ((match = trunkRegex.exec(text)) !== null) {
+        interfaces.push({
+          type: "Eth-Trunk",
+          number: match[1],
+          fullName: `Eth-Trunk ${match[1]}`,
+          cliName: `Eth-Trunk ${match[1]}`
+        });
+      }
 
-        let match;
+      const vlanifRegex = /Vlanif\s*(\d+)/gi;
 
-        while ((match = interfaceRegex.exec(text)) !== null) {
-          const type = normalizeInterfaceType(match[1]);
-          const frame = match[2];
-          const slot = match[3];
-          const port = match[4];
+      while ((match = vlanifRegex.exec(text)) !== null) {
+        interfaces.push({
+          type: "Vlanif",
+          number: match[1],
+          fullName: `Vlanif ${match[1]}`,
+          cliName: `Vlanif ${match[1]}`
+        });
+      }
+
+      return removeDuplicate(interfaces);
+    }
+
+    function extractInterfacesFromDescription(text) {
+      const interfaces = [];
+      const lines = cleanText(text).split(/\r?\n/);
+
+      const lineRegex =
+        /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
+
+      lines.forEach(function (line) {
+        const match = line.match(lineRegex);
+
+        if (match) {
+          const rawType = match[1];
+          const portOnly = match[2];
+          const speed = match[3] || "";
+          const parts = portOnly.split("/");
+
+          let cliType = rawType;
+
+          if (rawType === "GE") {
+            cliType = "GigabitEthernet";
+          }
 
           interfaces.push({
-            type: type,
-            frame: frame,
-            slot: slot,
-            port: port,
-            fullName: `${type} ${frame}/${slot}/${port}`,
+            type: rawType,
+            cliType,
+            frame: parts[0],
+            slot: parts[1],
+            port: parts[2],
+            speed,
+            fullName: speed
+              ? `${rawType}${portOnly}(${speed})`
+              : `${rawType}${portOnly}`,
+            cliName: `${cliType} ${portOnly}`
           });
         }
+      });
 
-        const trunkRegex = /Eth-Trunk\s*(\d+)/gi;
+      return removeDuplicate(interfaces);
+    }
 
-        while ((match = trunkRegex.exec(text)) !== null) {
-          interfaces.push({
-            type: 'Eth-Trunk',
-            number: match[1],
-            fullName: `Eth-Trunk ${match[1]}`,
-          });
-        }
+    function extractGponPorts(text) {
+      const ports = [];
 
-        const vlanifRegex = /Vlanif\s*(\d+)/gi;
+      const regex =
+        /GPON\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
 
-        while ((match = vlanifRegex.exec(text)) !== null) {
-          interfaces.push({
-            type: 'Vlanif',
-            number: match[1],
-            fullName: `Vlanif ${match[1]}`,
-          });
-        }
+      let match;
 
-        return removeDuplicate(interfaces);
+      while ((match = regex.exec(text)) !== null) {
+        ports.push({
+          frame: match[1],
+          slot: match[2],
+          port: match[3],
+          fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`
+        });
       }
 
-      function extractGponPorts(text) {
-        const ports = [];
+      return removeDuplicate(ports);
+    }
 
-        const regex = /GPON\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
+    function extractDevices(text) {
+      const devices = [];
 
-        let match;
+      const deviceRegex =
+        /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|OLT[-_A-Z0-9]*|OX[-_A-Z0-9]*)/gi;
 
-        while ((match = regex.exec(text)) !== null) {
-          ports.push({
-            frame: match[1],
-            slot: match[2],
-            port: match[3],
-            fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`,
-          });
-        }
+      let match;
 
-        return removeDuplicate(ports);
+      while ((match = deviceRegex.exec(text)) !== null) {
+        devices.push(match[1]);
       }
 
-      function extractDevices(text) {
-        const devices = [];
+      return Array.from(new Set(devices));
+    }
 
-        const deviceRegex =
-          /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|OLT[-_A-Z0-9]*|OX[-_A-Z0-9]*)/gi;
+    function extractPeerPortFromLink(text) {
+      const peerMatch = text.match(/link\d*_(\d+)\/(\d+)\/(\d+)/i);
 
-        let match;
-
-        while ((match = deviceRegex.exec(text)) !== null) {
-          devices.push(match[1]);
-        }
-
-        return Array.from(new Set(devices));
+      if (peerMatch) {
+        return `${peerMatch[1]}/${peerMatch[2]}/${peerMatch[3]}`;
       }
 
-      function extractPeerPortFromLink(text) {
-        const peerMatch = text.match(/link\d*_(\d+)\/(\d+)\/(\d+)/i);
+      return "-";
+    }
 
-        if (peerMatch) {
-          return `${peerMatch[1]}/${peerMatch[2]}/${peerMatch[3]}`;
-        }
+    function extractTicket(text) {
+      const match = text.match(/JB\d+-\d+/i);
+      return match ? match[0] : "-";
+    }
 
-        return '-';
+    function extractSeverity(text) {
+      const match = text.match(/\b(Critical|Major|Minor)\b/i);
+      return match ? match[1] : "Unknown";
+    }
+
+    function extractService(text) {
+      if (/Service Degraded/i.test(text)) return "Service Degraded";
+      if (/Service Unaffected/i.test(text)) return "Service Unaffected";
+      if (/Service Interrupted/i.test(text)) return "Service Interrupted";
+      return "-";
+    }
+
+    function extractJobType(text) {
+      if (/CRC/i.test(text)) return "CRC ERROR";
+      if (/LINK DOWN/i.test(text)) return "LINK DOWN";
+      if (/\bLOS\b/i.test(text)) return "LOS";
+      if (/CPU/i.test(text)) return "CPU HIGH";
+      if (/POWER|ไฟดับ/i.test(text)) return "POWER ALARM";
+      if (/TEMP|TEMPERATURE/i.test(text)) return "TEMPERATURE ALARM";
+      return "UNKNOWN";
+    }
+
+    function detectOltModel(text) {
+      if (/MA5608T/i.test(text)) return "MA5608T";
+      if (/MA5800/i.test(text)) return "MA5800";
+      return "UNKNOWN";
+    }
+
+    function getCliInterfaceName(interfaceObj) {
+      if (!interfaceObj) return "-";
+
+      if (interfaceObj.cliName) {
+        return interfaceObj.cliName;
       }
 
-      function extractTicket(text) {
-        const match = text.match(/JB\d+-\d+/i);
-        return match ? match[0] : '-';
+      const portOnly =
+        `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
+
+      if (interfaceObj.type === "GE") {
+        return `GigabitEthernet ${portOnly}`;
       }
 
-      function extractSeverity(text) {
-        const match = text.match(/\b(Critical|Major|Minor)\b/i);
-        return match ? match[1] : 'Unknown';
+      if (interfaceObj.type === "GigabitEthernet") {
+        return `GigabitEthernet ${portOnly}`;
       }
 
-      function extractService(text) {
-        if (/Service Degraded/i.test(text)) return 'Service Degraded';
-        if (/Service Unaffected/i.test(text)) return 'Service Unaffected';
-        if (/Service Interrupted/i.test(text)) return 'Service Interrupted';
-        return '-';
+      if (
+        interfaceObj.type === "10GE" ||
+        interfaceObj.type === "25GE" ||
+        interfaceObj.type === "40GE" ||
+        interfaceObj.type === "100GE"
+      ) {
+        return `${interfaceObj.type} ${portOnly}`;
       }
 
-      function extractJobType(text) {
-        if (/CRC/i.test(text)) return 'CRC ERROR';
-        if (/LINK DOWN/i.test(text)) return 'LINK DOWN';
-        if (/\bLOS\b/i.test(text)) return 'LOS';
-        if (/CPU/i.test(text)) return 'CPU HIGH';
-        if (/POWER|ไฟดับ/i.test(text)) return 'POWER ALARM';
-        if (/TEMP|TEMPERATURE/i.test(text)) return 'TEMPERATURE ALARM';
-        return 'UNKNOWN';
+      return interfaceObj.fullName;
+    }
+
+    function cleanDeviceName(deviceName) {
+      if (!deviceName || deviceName === "-") {
+        return "-";
       }
 
-      function detectOltModel(text) {
-        if (/MA5608T/i.test(text)) return 'MA5608T';
-        if (/MA5800/i.test(text)) return 'MA5800';
-        return 'UNKNOWN';
+      return deviceName.replace(/\([A-Z]+\)/gi, "");
+    }
+
+    function buildRemoteAccess(localDevice, peerDevice, mode) {
+      const cleanLocalDevice = cleanDeviceName(localDevice);
+      const cleanPeerDevice = cleanDeviceName(peerDevice);
+
+      if (mode === "OLT") {
+        return `========================================
+REMOTE ACCESS
+========================================
+
+# Remote เข้า OLT ผ่าน Telnet
+telnet [OLT-NAME]
+
+# ตัวอย่าง
+telnet ox_1401_043_zz_01hw
+
+# เข้าโหมดใช้งาน
+enable
+
+# เข้าโหมด Config
+config
+
+# หมายเหตุ
+# เปลี่ยน [OLT-NAME] เป็นชื่อ OLT จริงจาก Job หรือระบบ Monitor
+`;
       }
 
-      function isPhysicalInterface(interfaceObj) {
-        if (!interfaceObj) return false;
+      return `========================================
+REMOTE ACCESS
+========================================
 
-        return ['GigabitEthernet', '10GE', '25GE', '40GE', '100GE'].includes(
-          interfaceObj.type
+# SSH เข้า ME / MME
+ssh [username]@${cleanLocalDevice}
+
+# SSH เข้า Peer Device
+ssh [username]@${cleanPeerDevice}
+
+# ตัวอย่าง
+ssh username@${cleanLocalDevice}
+
+# หมายเหตุ
+# เปลี่ยน [username] เป็น Username ที่ได้รับสิทธิ์
+# หากชื่อ Peer มีวงเล็บ เช่น ME-3701-101(MDH)
+# ระบบจะตัดเหลือ ME-3701-101 สำหรับใช้ SSH
+`;
+    }
+
+    function buildInterfaceDiscovery(localInterface, peerPort) {
+      let portOnly = "-";
+
+      if (localInterface && localInterface.frame) {
+        portOnly =
+          `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
+      } else if (peerPort && peerPort !== "-") {
+        portOnly = peerPort.replace(
+          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
+          ""
         );
       }
 
-      function buildMeCommands(localInterface, jobType) {
-        let commands = '';
+      return `========================================
+INTERFACE DISCOVERY
+========================================
 
-        if (localInterface && localInterface.fullName) {
-          const ifName = getCliInterfaceName(localInterface);
+# ใช้ค้นหา Local Interface จริงจากเลข Port / Description
+display interface description | include ${portOnly}
 
-          commands += `# Interface
-                                                          display interface ${ifName}
+# ถ้าพบผลลัพธ์ลักษณะนี้:
+# GE0/2/0(10G)    up    up    MME-xxxx_link_0/5/2_OFC
 
-                                                          # Config ของ Port
-                                                          display current-configuration interface ${ifName}
+# แปลว่า Local Interface จริงคือ:
+# GE0/2/0(10G)
 
-                                                          # Optical / Error / Traffic
-                                                          # หมายเหตุ: บางรุ่นไม่รองรับ display transceiver
-                                                          # ให้ดู RX/TX, CRC, Traffic จาก display interface เป็นหลัก
-                                                          display interface ${ifName}
+# และคำสั่ง CLI จริงที่ควรใช้คือ:
+# display interface GigabitEthernet 0/2/0
 
-                                                          `;
-        }
+หมายเหตุ:
+- เลข 0/5/2 ใน Description อาจเป็น Port ฝั่งปลายทาง
+- ให้ยึด Interface คอลัมน์แรกจากผล display interface description เป็นหลัก
+`;
+    }
 
-        commands += `# LLDP
-                                                          display lldp neighbor brief
+    function buildMeCommands(localInterface, jobType) {
+      let commands = "";
 
-                                                          # Alarm
-                                                          display alarm active
+      if (localInterface && localInterface.fullName) {
+        const ifName = getCliInterfaceName(localInterface);
 
-                                                          # Log
-                                                          display logbuffer
+        commands += `# Interface
+display interface ${ifName}
 
-                                                          # Description
-                                                          display interface description
-                                                          `;
+# Config ของ Port
+display current-configuration interface ${ifName}
 
-        if (jobType === 'CPU HIGH') {
-          commands += `
-                                                          # CPU
-                                                          display cpu-usage
+# Optical / Error / Traffic
+# หมายเหตุ: บางรุ่นไม่รองรับ display transceiver
+# ให้ดู RX/TX, CRC, Traffic จาก display interface เป็นหลัก
+display interface ${ifName}
 
-                                                          # Memory
-                                                          display memory-usage
-
-                                                          # Version / Uptime
-                                                          display version
-                                                          `;
-        }
-
-        return commands;
+`;
       }
 
-      function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
-        let commands = '';
+      commands += `# LLDP
+display lldp neighbor brief
 
-        commands += `# ตรวจสอบ Board / Card
-                                                          display board 0/[slot]
+# Alarm
+display alarm active
 
-                                                          # ตรวจสอบ LLDP / ปลายทาง
-                                                          display lldp neighbor brief
+# Log
+display logbuffer
 
-                                                          # ตรวจสอบ Alarm
-                                                          display alarm active
+# Description
+display interface description
+`;
 
-                                                          # ตรวจสอบ Log
-                                                          display logbuffer
+      if (jobType === "CPU HIGH") {
+        commands += `
+# CPU
+display cpu-usage
 
-                                                          # เช็คไฟดับ / Power OLT
-                                                          interface emu 1
-                                                          display power run info
+# Memory
+display memory-usage
 
-                                                          `;
-
-        if (localInterface && localInterface.fullName) {
-          commands += `# ตรวจสอบ Uplink Interface
-                                                          display interface ${localInterface.fullName}
-
-                                                          # ตรวจสอบ Config Uplink
-                                                          display current-configuration interface ${localInterface.fullName}
-
-                                                          `;
-        }
-
-        if (localInterface && localInterface.slot && localInterface.port) {
-          commands += buildOltSlotPortCommands(
-            localInterface.slot,
-            localInterface.port,
-            oltModel
-          );
-        }
-
-        if (gponPorts.length > 0) {
-          gponPorts.forEach(function (gpon) {
-            commands += `# ตรวจสอบ GPON Port
-                                                          # ${gpon.fullName}
-
-                                                          display board 0/${gpon.slot}
-
-                                                          `;
-          });
-        }
-
-        return commands;
+# Version / Uptime
+display version
+`;
       }
 
-      function buildOltSlotPortCommands(slot, port, oltModel) {
-        if (oltModel === 'MA5608T') {
-          return `# MA5608T - เข้า Control Card
-                                                          interface mcu 0/${slot}
+      return commands;
+    }
 
-                                                          # เช็คค่าแสง
-                                                          display port ddm-info ${port}
+    function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
+      let commands = "";
 
-                                                          # เช็ค CRC / Statistics
-                                                          display port statistics ${port}
+      commands += `# ตรวจสอบ Board / Card
+display board 0/[slot]
 
-                                                          `;
-        }
+# ตรวจสอบ LLDP / ปลายทาง
+display lldp neighbor brief
 
-        if (oltModel === 'MA5800') {
-          return `# MA5800 - เข้า Control Card
-                                                          interface mpu 0/${slot}
+# ตรวจสอบ Alarm
+display alarm active
 
-                                                          # เช็คค่าแสง
-                                                          display port ddm-info ${port}
+# ตรวจสอบ Log
+display logbuffer
 
-                                                          # เช็ค CRC / Statistics
-                                                          display port statistics ${port}
+# เช็คไฟดับ / Power OLT
+interface emu 1
+display power run info
 
-                                                          `;
-        }
+`;
 
-        return `# ถ้าเป็น MA5608T
-                                                          interface mcu 0/${slot}
-                                                          display port ddm-info ${port}
-                                                          display port statistics ${port}
+      if (localInterface && localInterface.fullName) {
+        const ifName = getCliInterfaceName(localInterface);
 
-                                                          # ถ้าเป็น MA5800
-                                                          interface mpu 0/${slot}
-                                                          display port ddm-info ${port}
-                                                          display port statistics ${port}
+        commands += `# ตรวจสอบ Uplink Interface
+display interface ${ifName}
 
-                                                          `;
+# ตรวจสอบ Config Uplink
+display current-configuration interface ${ifName}
+
+`;
       }
 
-      function buildWhatToCheck(localPort, jobType, mode) {
-        if (mode === 'OLT') {
+      if (localInterface && localInterface.slot && localInterface.port) {
+        commands += buildOltSlotPortCommands(
+          localInterface.slot,
+          localInterface.port,
+          oltModel
+        );
+      }
+
+      if (gponPorts.length > 0) {
+        gponPorts.forEach(function (gpon) {
+          commands += `# ตรวจสอบ GPON Port
+# ${gpon.fullName}
+
+display board 0/${gpon.slot}
+
+`;
+        });
+      }
+
+      return commands;
+    }
+
+    function buildOltSlotPortCommands(slot, port, oltModel) {
+      if (oltModel === "MA5608T") {
+        return `# MA5608T - เข้า Control Card
+interface mcu 0/${slot}
+
+# เช็คค่าแสง
+display port ddm-info ${port}
+
+# เช็ค CRC / Statistics
+display port statistics ${port}
+
+`;
+      }
+
+      if (oltModel === "MA5800") {
+        return `# MA5800 - เข้า Control Card
+interface mpu 0/${slot}
+
+# เช็คค่าแสง
+display port ddm-info ${port}
+
+# เช็ค CRC / Statistics
+display port statistics ${port}
+
+`;
+      }
+
+      return `# ถ้าเป็น MA5608T
+interface mcu 0/${slot}
+display port ddm-info ${port}
+display port statistics ${port}
+
+# ถ้าเป็น MA5800
+interface mpu 0/${slot}
+display port ddm-info ${port}
+display port statistics ${port}
+
+`;
+    }
+
+    function buildWhatToCheck(localPort, jobType, mode) {
+      if (mode === "OLT") {
+        return `========================================
+WHAT TO CHECK
+========================================
+
+display board 0/[slot]
+- ตรวจสอบ Board / Card ว่า Online หรือไม่
+- ดูสถานะ Port ว่า Up/Down หรือมี Alarm หรือไม่
+
+display port ddm-info [port]
+- ดู RX Power
+- ดู TX Power
+- ดูสถานะ SFP / Optical Module
+
+display port statistics [port]
+- ดู CRC
+- ดู Error Counter
+- ตรวจสอบว่า Error เพิ่มต่อเนื่องหรือไม่
+
+display alarm active
+- ดู Alarm ที่ยัง Active เช่น LOS, Power, Board, Optical
+
+display logbuffer
+- ดูประวัติ Link Up/Down หรือ Alarm ย้อนหลัง
+
+interface emu 1
+display power run info
+- ใช้เช็คไฟดับ / Power Module / AC Fail
+`;
+      }
+
+      return `========================================
+WHAT TO CHECK
+========================================
+
+display interface ${localPort}
+- ดู current state ว่า UP/DOWN
+- ดู CRC / Input Error / Output Error
+- ดู Input rate / Output rate
+- ดู Last physical up/down time
+- ดู RX Power / TX Power หากอุปกรณ์แสดงค่า Optical ใน display interface
+- หมายเหตุ: เครื่องบางรุ่นไม่รองรับ display transceiver interface
+
+display current-configuration interface ${localPort}
+- ดู Description
+- ดู VLAN / Trunk
+- ดูว่ามี shutdown หรือไม่
+- ดู Config ที่เกี่ยวข้องกับ Port
+
+display lldp neighbor brief
+- ยืนยันว่า Port ต่อไปหาอุปกรณ์ปลายทางถูกต้องหรือไม่
+
+display alarm active
+- ดู Alarm ที่ยัง Active เช่น LOS, Optical Alarm, Link Down
+
+display logbuffer
+- ดูประวัติ Link Up/Down หรือ CRC Alarm ย้อนหลัง
+`;
+    }
+
+    function buildJobMethod(localPort, jobType, mode) {
+      if (jobType === "CRC ERROR") {
+        return `========================================
+CRC CHECK METHOD
+========================================
+
+1. รันคำสั่ง:
+display interface ${localPort}
+
+2. จดค่า CRC ปัจจุบัน
+
+3. รอ 3-5 นาที
+
+4. รันคำสั่งเดิมอีกครั้ง
+
+5. เปรียบเทียบค่า CRC
+
+ถ้า CRC เพิ่มขึ้น:
+- มีปัญหาบน Link จริง
+- ให้ตรวจ Fiber / Patch Cord / Connector / SFP
+
+ถ้า CRC ไม่เพิ่ม:
+- อาจเป็น Alarm เก่าหรือปัญหาหายแล้ว
+- Monitor ต่อเพิ่มเติม
+`;
+      }
+
+      if (jobType === "LINK DOWN" || jobType === "LOS") {
+        return `========================================
+LINK DOWN / LOS CHECK METHOD
+========================================
+
+1. ตรวจสอบสถานะ Interface:
+display interface ${localPort}
+
+2. ตรวจสอบค่าแสง / RX TX / Error:
+display interface ${localPort}
+
+3. ตรวจสอบ LLDP:
+display lldp neighbor brief
+
+4. ตรวจสอบ Alarm:
+display alarm active
+
+5. ตรวจสอบ Log:
+display logbuffer
+
+ถ้า RX Power หาย / มี LOS:
+- สงสัย Fiber Cut / SFP / ปลายทาง Down
+
+ถ้า Interface Down แต่ไม่มี Optical Alarm:
+- ตรวจสอบ Config / Shutdown / Remote Port
+`;
+      }
+
+      if (jobType === "POWER ALARM") {
+        if (mode === "OLT") {
           return `========================================
-            WHAT TO CHECK
-            ========================================
+POWER CHECK METHOD
+========================================
 
-            display board 0/[slot]
-            - ตรวจสอบ Board / Card ว่า Online หรือไม่
-            - ดูสถานะ Port ว่า Up/Down หรือมี Alarm หรือไม่
+1. เข้า EMU:
+interface emu 1
 
-            display port ddm-info [port]
-            - ดู RX Power
-            - ดู TX Power
-            - ดูสถานะ SFP / Optical Module
+2. ตรวจสอบ Power:
+display power run info
 
-            display port statistics [port]
-            - ดู CRC
-            - ดู Error Counter
-            - ตรวจสอบว่า Error เพิ่มต่อเนื่องหรือไม่
+3. ตรวจสอบ Alarm:
+display alarm active
 
-            display alarm active
-            - ดู Alarm ที่ยัง Active เช่น LOS, Power, Board, Optical
+4. ตรวจสอบ Log:
+display logbuffer
 
-            display logbuffer
-            - ดูประวัติ Link Up/Down หรือ Alarm ย้อนหลัง
-
-            interface emu 1
-            display power run info
-            - ใช้เช็คไฟดับ / Power Module / AC Fail
-            `;
+ถ้าพบ AC Fail / Power Fail:
+- ตรวจสอบไฟฟ้าหน้างาน
+- ตรวจสอบ Power Module
+- ประสานทีม Site / Facility
+`;
         }
 
         return `========================================
-            WHAT TO CHECK
-            ========================================
+POWER CHECK METHOD
+========================================
 
-            display interface ${localPort}
-            - ดู current state ว่า UP/DOWN
-            - ดู CRC / Input Error / Output Error
-            - ดู Input rate / Output rate
-            - ดู Last physical up/down time
-            - ดู RX Power / TX Power หากอุปกรณ์แสดงค่า Optical ใน display interface
-            - หมายเหตุ: เครื่องบางรุ่นไม่รองรับ display transceiver interface
+1. ตรวจสอบ Alarm:
+display alarm active
 
-            display current-configuration interface ${localPort}
-            - ดู Description
-            - ดู VLAN / Trunk
-            - ดูว่ามี shutdown หรือไม่
-            - ดู Config ที่เกี่ยวข้องกับ Port
+2. ตรวจสอบ Log:
+display logbuffer
 
-            display lldp neighbor brief
-            - ยืนยันว่า Port ต่อไปหาอุปกรณ์ปลายทางถูกต้องหรือไม่
+3. ตรวจสอบ Version / Uptime:
+display version
 
-            display alarm active
-            - ดู Alarm ที่ยัง Active เช่น LOS, Optical Alarm, Link Down
-
-            display logbuffer
-            - ดูประวัติ Link Up/Down หรือ CRC Alarm ย้อนหลัง
-            `;
+ถ้าพบ Power Alarm:
+- ตรวจสอบไฟฟ้าหน้างาน
+- ตรวจสอบ PSU / Power Module
+- ประสานทีม Site / Facility
+`;
       }
-      function buildJobMethod(localPort, jobType, mode) {
-        if (jobType === 'CRC ERROR') {
-          return `========================================
-      CRC CHECK METHOD
-      ========================================
 
-      1. รันคำสั่ง:
-      display interface ${localPort}
-
-      2. จดค่า CRC ปัจจุบัน
-
-      3. รอ 3-5 นาที
-
-      4. รันคำสั่งเดิมอีกครั้ง
-
-      5. เปรียบเทียบค่า CRC
-
-      ถ้า CRC เพิ่มขึ้น:
-      - มีปัญหาบน Link จริง
-      - ให้ตรวจ Fiber / Patch Cord / Connector / SFP
-
-      ถ้า CRC ไม่เพิ่ม:
-      - อาจเป็น Alarm เก่าหรือปัญหาหายแล้ว
-      - Monitor ต่อเพิ่มเติม
-      `;
-        }
-
-        if (jobType === 'LINK DOWN' || jobType === 'LOS') {
-          return `========================================
-      LINK DOWN / LOS CHECK METHOD
-      ========================================
-
-      1. ตรวจสอบสถานะ Interface:
-      display interface ${localPort}
-
-      2. ตรวจสอบค่าแสง / RX TX / Error:
-      display interface ${localPort}
-
-      3. ตรวจสอบ LLDP:
-      display lldp neighbor brief
-
-      4. ตรวจสอบ Alarm:
-      display alarm active
-
-      5. ตรวจสอบ Log:
-      display logbuffer
-
-      ถ้า RX Power หาย / มี LOS:
-      - สงสัย Fiber Cut / SFP / ปลายทาง Down
-
-      ถ้า Interface Down แต่ไม่มี Optical Alarm:
-      - ตรวจสอบ Config / Shutdown / Remote Port
-      `;
-        }
-
-        if (jobType === 'POWER ALARM') {
-          if (mode === 'OLT') {
-            return `========================================
-      POWER CHECK METHOD
-      ========================================
-
-      1. เข้า EMU:
-      interface emu 1
-
-      2. ตรวจสอบ Power:
-      display power run info
-
-      3. ตรวจสอบ Alarm:
-      display alarm active
-
-      4. ตรวจสอบ Log:
-      display logbuffer
-
-      ถ้าพบ AC Fail / Power Fail:
-      - ตรวจสอบไฟฟ้าหน้างาน
-      - ตรวจสอบ Power Module
-      - ประสานทีม Site / Facility
-      `;
-          }
-
-          return `========================================
-      POWER CHECK METHOD
-      ========================================
-
-      1. ตรวจสอบ Alarm:
-      display alarm active
-
-      2. ตรวจสอบ Log:
-      display logbuffer
-
-      3. ตรวจสอบ Version / Uptime:
-      display version
-
-      ถ้าพบ Power Alarm:
-      - ตรวจสอบไฟฟ้าหน้างาน
-      - ตรวจสอบ PSU / Power Module
-      - ประสานทีม Site / Facility
-      `;
-        }
-
-        if (jobType === 'CPU HIGH') {
-          return `========================================
-      CPU CHECK METHOD
-      ========================================
-
-      1. ตรวจสอบ CPU:
-      display cpu-usage
-
-      2. ตรวจสอบ Memory:
-      display memory-usage
-
-      3. ตรวจสอบ Alarm:
-      display alarm active
-
-      4. ตรวจสอบ Log:
-      display logbuffer
-
-      ถ้า CPU สูงต่อเนื่อง:
-      - สงสัย Loop
-      - Broadcast Storm
-      - Traffic ผิดปกติ
-      - Process ผิดปกติ
-      `;
-        }
-
+      if (jobType === "CPU HIGH") {
         return `========================================
-      GENERAL CHECK METHOD
-      ========================================
+CPU CHECK METHOD
+========================================
 
-      1. ตรวจสอบ Interface / Board
-      2. ตรวจสอบ Alarm
-      3. ตรวจสอบ Log
-      4. ตรวจสอบ Description / Config
-      5. วิเคราะห์ร่วมกับข้อมูลจาก Ticket
-      `;
+1. ตรวจสอบ CPU:
+display cpu-usage
+
+2. ตรวจสอบ Memory:
+display memory-usage
+
+3. ตรวจสอบ Alarm:
+display alarm active
+
+4. ตรวจสอบ Log:
+display logbuffer
+
+ถ้า CPU สูงต่อเนื่อง:
+- สงสัย Loop
+- Broadcast Storm
+- Traffic ผิดปกติ
+- Process ผิดปกติ
+`;
       }
 
-      function buildValueGuide(jobType) {
-        return `========================================
-                                                          VALUE GUIDE
-                                                          ========================================
+      return `========================================
+GENERAL CHECK METHOD
+========================================
 
-                                                          CRC
-                                                          - 0 หรือไม่เพิ่ม = ปกติ
-                                                          - เพิ่มต่อเนื่อง = ผิดปกติ
+1. ตรวจสอบ Interface / Board
+2. ตรวจสอบ Alarm
+3. ตรวจสอบ Log
+4. ตรวจสอบ Description / Config
+5. วิเคราะห์ร่วมกับข้อมูลจาก Ticket
+`;
+    }
 
-                                                          RX Power
-                                                          - ปกติขึ้นกับชนิด SFP และระยะทาง
-                                                          - ถ้าต่ำกว่าค่าปกติมาก หรือใกล้ Threshold = สงสัย Fiber Loss
-                                                          - ถ้าไม่มีค่า RX / No Signal = สงสัย Fiber ขาด หรือปลายทาง Down
-
-                                                          Link State
-                                                          - UP = Link ยังติด แต่อาจมี Error
-                                                          - DOWN = Link ขาด, ปลายทาง Down, SFP/Fiber/Config มีปัญหา
-
-                                                          Traffic
-                                                          - Input/Output สูงผิดปกติ = อาจมี Traffic Burst หรือ Loop
-                                                          - Traffic เป็น 0 ทั้งที่ควรมีงานวิ่ง = ตรวจสอบ MAC / Peer / Config เพิ่มเติม
-
-                                                          Alarm
-                                                          - Active Alarm = ปัญหายังเกิดอยู่
-                                                          - Cleared Alarm = อาจเป็นเหตุการณ์ย้อนหลัง ต้องดู Log ประกอบ
-                                                          `;
-      }
-
-      function buildEscalation(jobType, mode) {
-        return `========================================
-                                                          ESCALATION
-                                                          ========================================
-
-                                                          ส่ง Fiber Team เมื่อ:
-                                                          - CRC เพิ่มต่อเนื่อง
-                                                          - RX Power ต่ำผิดปกติ
-                                                          - มี LOS / Optical Alarm
-                                                          - Link Flap หลายครั้ง
-                                                          - ทำความสะอาด Connector แล้วยังไม่หาย
-
-                                                          ส่ง Transport / NOC เมื่อ:
-                                                          - พบ Port ฝั่งตรงข้าม Down
-                                                          - LLDP ไม่พบปลายทาง
-                                                          - Config ไม่ตรง
-                                                          - มี Alarm หลาย Node
-                                                          - สงสัย Ring / Uplink / Core Link กระทบหลายวงจร
-
-                                                          ส่ง Site / Facility เมื่อ:
-                                                          - พบ Power Alarm
-                                                          - พบไฟดับ
-                                                          - พบอุปกรณ์ Reboot หรือ Uptime ผิดปกติ
-                                                          `;
-      }
-
-      function buildSafetyNote() {
-        return `========================================
-                                                          SAFETY NOTE
-                                                          ========================================
-
-                                                          ก่อนทำ Port Bounce ต้องตรวจสอบก่อนทุกครั้ง:
-
-                                                          1. ตรวจสอบ Description
-                                                          display interface description
-
-                                                          2. ตรวจสอบ LLDP
-                                                          display lldp neighbor brief
-
-                                                          3. ยืนยันว่า Port ไม่ใช่ Uplink หลัก / Ring / Core Link
-
-                                                          4. ขออนุญาตหรือประสานผู้เกี่ยวข้องก่อนทำ
-
-                                                          5. ห้าม shutdown ถ้ายังไม่แน่ใจผลกระทบ
-
-                                                          หมายเหตุ:
-                                                          คำสั่ง shutdown / undo shutdown อาจกระทบลูกค้าหรือวงจรจำนวนมากได้
-                                                          `;
-      }
-
-      function buildRecommendation(jobType, mode) {
-        if (mode === 'OLT') {
-          if (jobType === 'CRC ERROR') {
-            return `Priority Check OLT
+    function buildRecommendation(jobType, mode) {
+      if (mode === "OLT") {
+        if (jobType === "CRC ERROR") {
+          return `Priority Check OLT
 
 1. ตรวจสอบ Board / Card
 2. ตรวจสอบ Port Statistics
@@ -784,10 +880,10 @@ Possible Cause
 - SFP / Module
 - Uplink Port Error
 `;
-          }
+        }
 
-          if (jobType === 'LINK DOWN' || jobType === 'LOS') {
-            return `Priority Check OLT
+        if (jobType === "LINK DOWN" || jobType === "LOS") {
+          return `Priority Check OLT
 
 1. ตรวจสอบ Port Down จริงหรือไม่
 2. ตรวจสอบค่าแสง DDM
@@ -804,10 +900,10 @@ Possible Cause
 - Power Problem
 - Board / Card Problem
 `;
-          }
+        }
 
-          if (jobType === 'POWER ALARM') {
-            return `Priority Check OLT
+        if (jobType === "POWER ALARM") {
+          return `Priority Check OLT
 
 1. interface emu 1
 2. display power run info
@@ -821,9 +917,9 @@ Possible Cause
 - Power Module Fail
 - Site Power Problem
 `;
-          }
+        }
 
-          return `Priority Check OLT
+        return `Priority Check OLT
 
 1. display board 0/[slot]
 2. display alarm active
@@ -832,10 +928,10 @@ Possible Cause
 5. interface emu 1
 6. display power run info
 `;
-        }
+      }
 
-        if (jobType === 'CRC ERROR') {
-          return `Priority Check ME
+      if (jobType === "CRC ERROR") {
+        return `Priority Check ME
 
 1. Link Status
 2. RX/TX Power
@@ -857,10 +953,10 @@ Impact
 - Packet Loss
 - Latency Increase
 `;
-        }
+      }
 
-        if (jobType === 'LINK DOWN' || jobType === 'LOS') {
-          return `Priority Check ME
+      if (jobType === "LINK DOWN" || jobType === "LOS") {
+        return `Priority Check ME
 
 1. Interface Status
 2. Optical Power
@@ -876,10 +972,10 @@ Possible Cause
 - Device Reboot
 - Power Failure
 `;
-        }
+      }
 
-        if (jobType === 'POWER ALARM') {
-          return `Priority Check ME
+      if (jobType === "POWER ALARM") {
+        return `Priority Check ME
 
 1. display alarm active
 2. display logbuffer
@@ -892,10 +988,10 @@ Possible Cause
 - Site Power
 - Device Reboot
 `;
-        }
+      }
 
-        if (jobType === 'CPU HIGH') {
-          return `Priority Check ME
+      if (jobType === "CPU HIGH") {
+        return `Priority Check ME
 
 1. CPU Usage
 2. Memory Usage
@@ -910,9 +1006,9 @@ Possible Cause
 - High Traffic
 - Process Abnormal
 `;
-        }
+      }
 
-        return `Priority Check
+      return `Priority Check
 
 1. Alarm
 2. Log
@@ -923,384 +1019,292 @@ Possible Cause
 
 - Need manual analysis
 `;
+    }
+
+    function buildValueGuide(jobType) {
+      return `========================================
+VALUE GUIDE
+========================================
+
+CRC
+- 0 หรือไม่เพิ่ม = ปกติ
+- เพิ่มต่อเนื่อง = ผิดปกติ
+
+RX Power
+- ปกติขึ้นกับชนิด SFP และระยะทาง
+- ถ้าต่ำกว่าค่าปกติมาก หรือใกล้ Threshold = สงสัย Fiber Loss
+- ถ้าไม่มีค่า RX / No Signal = สงสัย Fiber ขาด หรือปลายทาง Down
+
+Link State
+- UP = Link ยังติด แต่อาจมี Error
+- DOWN = Link ขาด, ปลายทาง Down, SFP/Fiber/Config มีปัญหา
+
+Traffic
+- Input/Output สูงผิดปกติ = อาจมี Traffic Burst หรือ Loop
+- Traffic เป็น 0 ทั้งที่ควรมีงานวิ่ง = ตรวจสอบ MAC / Peer / Config เพิ่มเติม
+
+Alarm
+- Active Alarm = ปัญหายังเกิดอยู่
+- Cleared Alarm = อาจเป็นเหตุการณ์ย้อนหลัง ต้องดู Log ประกอบ
+`;
+    }
+
+    function buildEscalation(jobType, mode) {
+      return `========================================
+ESCALATION
+========================================
+
+ส่ง Fiber Team เมื่อ:
+- CRC เพิ่มต่อเนื่อง
+- RX Power ต่ำผิดปกติ
+- มี LOS / Optical Alarm
+- Link Flap หลายครั้ง
+- ทำความสะอาด Connector แล้วยังไม่หาย
+
+ส่ง Transport / NOC เมื่อ:
+- พบ Port ฝั่งตรงข้าม Down
+- LLDP ไม่พบปลายทาง
+- Config ไม่ตรง
+- มี Alarm หลาย Node
+- สงสัย Ring / Uplink / Core Link กระทบหลายวงจร
+
+ส่ง Site / Facility เมื่อ:
+- พบ Power Alarm
+- พบไฟดับ
+- พบอุปกรณ์ Reboot หรือ Uptime ผิดปกติ
+`;
+    }
+
+    function buildSafetyNote() {
+      return `========================================
+SAFETY NOTE
+========================================
+
+ก่อนทำ Port Bounce ต้องตรวจสอบก่อนทุกครั้ง:
+
+1. ตรวจสอบ Description
+display interface description
+
+2. ตรวจสอบ LLDP
+display lldp neighbor brief
+
+3. ยืนยันว่า Port ไม่ใช่ Uplink หลัก / Ring / Core Link
+
+4. ขออนุญาตหรือประสานผู้เกี่ยวข้องก่อนทำ
+
+5. ห้าม shutdown ถ้ายังไม่แน่ใจผลกระทบ
+
+หมายเหตุ:
+คำสั่ง shutdown / undo shutdown อาจกระทบลูกค้าหรือวงจรจำนวนมากได้
+`;
+    }
+
+    function buildPortBounce(localInterface, mode, oltModel) {
+      if (!localInterface || !localInterface.fullName) {
+        return "ไม่พบ Local Port จึงยังไม่แนะนำคำสั่ง shutdown / undo shutdown";
       }
 
-      function buildPortBounce(localInterface, mode, oltModel) {
-        if (!localInterface || !localInterface.fullName) {
-          return 'ไม่พบ Local Port จึงยังไม่แนะนำคำสั่ง shutdown / undo shutdown';
-        }
-
-        if (mode === 'OLT') {
-          if (oltModel === 'MA5608T') {
-            return `# ตรวจสอบ Topology ก่อนทุกครั้ง
-
-                                                          interface mcu 0/${localInterface.slot}
-
-                                                          shutdown ${localInterface.port}
-
-                                                          undo shutdown ${localInterface.port}`;
-          }
-
-          if (oltModel === 'MA5800') {
-            return `# ตรวจสอบ Topology ก่อนทุกครั้ง
-
-                                                          interface mpu 0/${localInterface.slot}
-
-                                                          shutdown ${localInterface.port}
-
-                                                          undo shutdown ${localInterface.port}`;
-          }
-
+      if (mode === "OLT") {
+        if (oltModel === "MA5608T") {
           return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
-                                                          # ถ้าเป็น MA5608T
-                                                          interface mcu 0/${localInterface.slot}
-                                                          shutdown ${localInterface.port}
-                                                          undo shutdown ${localInterface.port}
+interface mcu 0/${localInterface.slot}
 
-                                                          # ถ้าเป็น MA5800
-                                                          interface mpu 0/${localInterface.slot}
-                                                          shutdown ${localInterface.port}
-                                                          undo shutdown ${localInterface.port}`;
+shutdown ${localInterface.port}
+
+undo shutdown ${localInterface.port}`;
+        }
+
+        if (oltModel === "MA5800") {
+          return `# ตรวจสอบ Topology ก่อนทุกครั้ง
+
+interface mpu 0/${localInterface.slot}
+
+shutdown ${localInterface.port}
+
+undo shutdown ${localInterface.port}`;
         }
 
         return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
-                                                          system-view
+# ถ้าเป็น MA5608T
+interface mcu 0/${localInterface.slot}
+shutdown ${localInterface.port}
+undo shutdown ${localInterface.port}
 
-                                                          interface ${getCliInterfaceName(
-                                                            localInterface
-                                                          )}
-
-                                                          shutdown
-
-                                                          undo shutdown`;
+# ถ้าเป็น MA5800
+interface mpu 0/${localInterface.slot}
+shutdown ${localInterface.port}
+undo shutdown ${localInterface.port}`;
       }
 
-      function analyzeJob(mode) {
-        const resultBox = document.getElementById('result');
+      return `# ตรวจสอบ Topology ก่อนทุกครั้ง
 
-        try {
-          const text = cleanText(document.getElementById('jobInput').value);
-          if (!text.trim()) {
-            alert('กรุณาวาง Job Ticket');
-            return;
-          }
+system-view
 
-          const ticket = extractTicket(text);
-          const severity = extractSeverity(text);
-          const service = extractService(text);
-          const jobType = extractJobType(text);
-          const oltModel = detectOltModel(text);
+interface ${getCliInterfaceName(localInterface)}
 
-          const devices = extractDevices(text);
-          const localDevice = devices[0] || '-';
-          const peerDevice = devices[1] || '-';
+shutdown
 
-          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
+undo shutdown`;
+    }
 
-          const discoveredInterfaces = extractInterfacesFromDescription(text);
+    function analyzeJob(mode) {
+      const resultBox = document.getElementById("result");
 
-          const physicalInterfaces =
-            discoveredInterfaces.length > 0
-              ? discoveredInterfaces
-              : extractInterfaces(text);
+      try {
+        const text = cleanText(document.getElementById("jobInput").value);
 
-          const gponPorts = extractGponPorts(text);
-
-          const localInterface = physicalInterfaces[0] || null;
-          const peerInterface = physicalInterfaces[1] || null;
-
-          const localPort = localInterface ? localInterface.fullName : '-';
-
-          const cliLocalPort = localInterface
-            ? getCliInterfaceName(localInterface)
-            : '-';
-
-          let peerPort = peerInterface ? peerInterface.fullName : '-';
-
-          if (peerPort === '-') {
-            peerPort = extractPeerPortFromLink(text);
-          }
-
-          let commands = '';
-
-          if (mode === 'OLT') {
-            commands = buildOltCommands(
-              localInterface,
-              gponPorts,
-              jobType,
-              oltModel
-            );
-          } else {
-            commands = buildMeCommands(localInterface, jobType);
-          }
-
-          const recommendation = buildRecommendation(jobType, mode);
-          const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
-          const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
-          const valueGuide = buildValueGuide(jobType);
-          const escalation = buildEscalation(jobType, mode);
-          const portBounce = buildPortBounce(localInterface, mode, oltModel);
-          const safetyNote = buildSafetyNote();
-
-          const output = `========================================
-                                                          JOB ANALYSIS
-                                                          ========================================
-
-                                                          ASSISTANT :
-                                                          Huawei ${
-                                                            mode === 'OLT'
-                                                              ? 'OLT'
-                                                              : 'NOC_ME'
-                                                          } Assistant
-
-                                                          TICKET :
-                                                          ${ticket}
-
-                                                          SERVICE :
-                                                          ${service}
-
-                                                          SEVERITY :
-                                                          ${severity}
-
-                                                          NETWORK TYPE :
-                                                          ${mode}
-
-                                                          OLT MODEL :
-                                                          ${
-                                                            mode === 'OLT'
-                                                              ? oltModel
-                                                              : '-'
-                                                          }
-
-                                                          JOB TYPE :
-                                                          ${jobType}
-
-                                                          LOCAL DEVICE :
-                                                          ${localDevice}
-
-                                                          LOCAL PORT :
-                                                          ${localPort}
-
-                                                          CLI LOCAL PORT :
-                                                          ${cliLocalPort}
-
-                                                          PEER DEVICE :
-                                                          ${peerDevice}
-
-                                                          PEER PORT :
-                                                          ${peerPort}
-
-                                                          ${remoteAccess}
-
-                                                          ========================================
-                                                          COMMANDS
-                                                          ========================================
-
-                                                          ${commands}
-
-                                                          ${whatToCheck}
-
-                                                          ${jobMethod}
-
-                                                          ========================================
-                                                          AI RECOMMENDATION
-                                                          ========================================
-
-                                                          ${recommendation}
-
-                                                          ${valueGuide}
-
-                                                          ${escalation}
-
-                                                          ========================================
-                                                          PORT BOUNCE
-                                                          ========================================
-
-                                                          ${portBounce}
-
-                                                          ${safetyNote}
-                                                          `;
-
-          resultBox.value = cleanOutputText(output);
-        } catch (error) {
-          resultBox.value =
-            'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
-            error.message +
-            '\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt; หรือ &gt; ปนอยู่ในโค้ด';
-          console.error(error);
+        if (!text.trim()) {
+          alert("กรุณาวาง Job Ticket");
+          return;
         }
+
+        const ticket = extractTicket(text);
+        const severity = extractSeverity(text);
+        const service = extractService(text);
+        const jobType = extractJobType(text);
+        const oltModel = detectOltModel(text);
+
+        const devices = extractDevices(text);
+        const localDevice = devices[0] || "-";
+        const peerDevice = devices[1] || "-";
+
+        const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
+
+        const discoveredInterfaces = extractInterfacesFromDescription(text);
+
+        const physicalInterfaces =
+          discoveredInterfaces.length > 0
+            ? discoveredInterfaces
+            : extractInterfaces(text);
+
+        const gponPorts = extractGponPorts(text);
+
+        const localInterface = physicalInterfaces[0] || null;
+        const peerInterface = physicalInterfaces[1] || null;
+
+        const localPort = localInterface ? localInterface.fullName : "-";
+
+        const cliLocalPort = localInterface
+          ? getCliInterfaceName(localInterface)
+          : "-";
+
+        let peerPort = peerInterface ? peerInterface.fullName : "-";
+
+        if (peerPort === "-") {
+          peerPort = extractPeerPortFromLink(text);
+        }
+
+        let commands = "";
+
+        if (mode === "OLT") {
+          commands = buildOltCommands(
+            localInterface,
+            gponPorts,
+            jobType,
+            oltModel
+          );
+        } else {
+          commands = buildMeCommands(localInterface, jobType);
+        }
+
+        const interfaceDiscovery = buildInterfaceDiscovery(localInterface, peerPort);
+        const recommendation = buildRecommendation(jobType, mode);
+        const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
+        const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
+        const valueGuide = buildValueGuide(jobType);
+        const escalation = buildEscalation(jobType, mode);
+        const portBounce = buildPortBounce(localInterface, mode, oltModel);
+        const safetyNote = buildSafetyNote();
+
+        const output = `========================================
+JOB ANALYSIS
+========================================
+
+ASSISTANT :
+Huawei ${mode === "OLT" ? "OLT" : "NOC_ME"} Assistant
+
+TICKET :
+${ticket}
+
+SERVICE :
+${service}
+
+SEVERITY :
+${severity}
+
+NETWORK TYPE :
+${mode}
+
+OLT MODEL :
+${mode === "OLT" ? oltModel : "-"}
+
+JOB TYPE :
+${jobType}
+
+LOCAL DEVICE :
+${localDevice}
+
+LOCAL PORT :
+${localPort}
+
+CLI LOCAL PORT :
+${cliLocalPort}
+
+PEER DEVICE :
+${peerDevice}
+
+PEER PORT :
+${peerPort}
+
+${remoteAccess}
+
+${interfaceDiscovery}
+
+========================================
+COMMANDS
+========================================
+
+${commands}
+
+${whatToCheck}
+
+${jobMethod}
+
+========================================
+AI RECOMMENDATION
+========================================
+
+${recommendation}
+
+${valueGuide}
+
+${escalation}
+
+========================================
+PORT BOUNCE
+========================================
+
+${portBounce}
+
+${safetyNote}
+`;
+
+        resultBox.value = cleanOutputText(output);
+      } catch (error) {
+        resultBox.value =
+          "เกิดข้อผิดพลาดใน JavaScript:\n\n" +
+          error.message +
+          "\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt; หรือ &gt; ปนอยู่ในโค้ด";
+        console.error(error);
       }
+    }
 
-      function clearAll() {
-        document.getElementById('jobInput').value = '';
-        document.getElementById('result').value = '';
-      }
-      function cleanDeviceName(deviceName) {
-        if (!deviceName || deviceName === '-') {
-          return '-';
-        }
-
-        return deviceName.replace(/\([A-Z]+\)/gi, '');
-      }
-
-      function buildRemoteAccess(localDevice, peerDevice, mode) {
-        const cleanLocalDevice = cleanDeviceName(localDevice);
-        const cleanPeerDevice = cleanDeviceName(peerDevice);
-
-        if (mode === 'OLT') {
-          return `========================================
-                                                          REMOTE ACCESS
-                                                          ========================================
-
-                                                          # Remote เข้า OLT ผ่าน Telnet
-                                                          telnet [OLT-NAME]
-
-                                                          # ตัวอย่าง
-                                                          telnet ox_1401_043_zz_01hw
-
-                                                          # เข้าโหมดใช้งาน
-                                                          enable
-
-                                                          # เข้าโหมด Config
-                                                          config
-
-                                                          # หมายเหตุ
-                                                          # เปลี่ยน [OLT-NAME] เป็นชื่อ OLT จริงจาก Job หรือระบบ Monitor
-                                                          `;
-        }
-
-        return `========================================
-                                                          REMOTE ACCESS
-                                                          ========================================
-
-                                                          # SSH เข้า ME / MME
-                                                          ssh [username]@${cleanLocalDevice}
-
-                                                          # SSH เข้า Peer Device
-                                                          ssh [username]@${cleanPeerDevice}
-
-                                                          # ตัวอย่าง
-                                                          ssh username@${cleanLocalDevice}
-
-                                                          # หมายเหตุ
-                                                          # เปลี่ยน [username] เป็น Username ที่ได้รับสิทธิ์
-                                                          # หากชื่อ Peer มีวงเล็บ เช่น ME-3701-101(MDH)
-                                                          # ระบบจะตัดเหลือ ME-3701-101 สำหรับใช้ SSH
-                                                          `;
-      }
-      function buildHuaweiCliInterfaceName(interfaceObj) {
-        if (!interfaceObj) {
-          return '-';
-        }
-
-        const portOnly = `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
-
-        if (interfaceObj.type === 'GE') {
-          return `GigabitEthernet ${portOnly}`;
-        }
-
-        if (interfaceObj.type === 'GigabitEthernet') {
-          return `GigabitEthernet ${portOnly}`;
-        }
-
-        if (
-          interfaceObj.type === '10GE' ||
-          interfaceObj.type === '25GE' ||
-          interfaceObj.type === '40GE' ||
-          interfaceObj.type === '100GE'
-        ) {
-          return `${interfaceObj.type} ${portOnly}`;
-        }
-
-        return interfaceObj.fullName;
-      }
-      function extractInterfacesFromDescription(text) {
-        const interfaces = [];
-        const lines = text.split(/\r?\n/);
-
-        const lineRegex =
-          /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down)/i;
-
-        lines.forEach(function (line) {
-          const match = line.match(lineRegex);
-
-          if (match) {
-            const rawType = match[1];
-            const portOnly = match[2];
-            const speed = match[3] || '';
-            const parts = portOnly.split('/');
-
-            let cliType = rawType;
-
-            if (rawType === 'GE') {
-              cliType = 'GigabitEthernet';
-            }
-
-            interfaces.push({
-              type: rawType,
-              cliType: cliType,
-              frame: parts[0],
-              slot: parts[1],
-              port: parts[2],
-              speed: speed,
-
-              // ใช้แสดงผล
-              fullName: speed
-                ? `${rawType}${portOnly}(${speed})`
-                : `${rawType}${portOnly}`,
-
-              // ใช้สั่ง CLI จริง
-              cliName: `${cliType} ${portOnly}`,
-            });
-          }
-        });
-
-        return removeDuplicate(interfaces);
-      }
-      function getCliInterfaceName(interfaceObj) {
-        if (!interfaceObj) {
-          return '-';
-        }
-
-        if (interfaceObj.cliName) {
-          return interfaceObj.cliName;
-        }
-
-        const portOnly = `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
-
-        if (interfaceObj.type === 'GE') {
-          return `GigabitEthernet ${portOnly}`;
-        }
-
-        if (interfaceObj.type === 'GigabitEthernet') {
-          return `GigabitEthernet ${portOnly}`;
-        }
-
-        if (
-          interfaceObj.type === '10GE' ||
-          interfaceObj.type === '25GE' ||
-          interfaceObj.type === '40GE' ||
-          interfaceObj.type === '100GE'
-        ) {
-          return `${interfaceObj.type} ${portOnly}`;
-        }
-
-        return interfaceObj.fullName;
-      }
-
-      function cleanText(text) {
-        return String(text)
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/&lt;br\s*\/?&gt;/gi, '\n')
-          .replace(/\n{3,}/g, '\n\n')
-          .trim();
-      }
-
-      function cleanOutputText(text) {
-        return cleanText(text);
-      }
-    </script>
-  </body>
+    function clearAll() {
+      document.getElementById("jobInput").value = "";
+      document.getElementById("result").value = "";
+    }
+  </script>
+</body>
 </html>
