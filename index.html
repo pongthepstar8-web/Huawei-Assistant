@@ -415,9 +415,19 @@ JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR"
         if (/CRC/i.test(text)) return 'CRC ERROR';
         if (/LINK DOWN/i.test(text)) return 'LINK DOWN';
         if (/\bLOS\b/i.test(text)) return 'LOS';
+        if (/FLAP|FLAPPING/i.test(text)) return 'LINK FLAP';
+        if (/PACKET LOSS/i.test(text)) return 'PACKET LOSS';
+        if (/LATENCY|DELAY/i.test(text)) return 'LATENCY';
+        if (/HIGH TRAFFIC|TRAFFIC HIGH/i.test(text)) return 'HIGH TRAFFIC';
+        if (/OPTICAL|RX POWER|LOW POWER/i.test(text))
+          return 'OPTICAL POWER LOW';
+        if (/SFP/i.test(text)) return 'SFP ALARM';
+        if (/LACP/i.test(text)) return 'LACP DOWN';
+        if (/ETH-TRUNK|TRUNK DOWN/i.test(text)) return 'ETH-TRUNK DOWN';
         if (/CPU/i.test(text)) return 'CPU HIGH';
         if (/POWER|ไฟดับ/i.test(text)) return 'POWER ALARM';
         if (/TEMP|TEMPERATURE/i.test(text)) return 'TEMPERATURE ALARM';
+
         return 'UNKNOWN';
       }
 
@@ -426,7 +436,11 @@ JB26-xxxxxxx : Service Degraded : OLT MA5800 GPON 0/1/5 CRC ERROR"
         if (/MA5800/i.test(text)) return 'MA5800';
         return 'UNKNOWN';
       }
+      function normalizeDeviceName(name) {
+        if (!name) return '-';
 
+        return name.replace(/_/g, '-').replace(/-0(\d+)/g, '-$1');
+      }
       function getCliInterfaceName(interfaceObj) {
         if (!interfaceObj) return '-';
 
