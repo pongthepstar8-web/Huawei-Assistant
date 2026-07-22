@@ -104,12 +104,6 @@
       white-space: nowrap;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-    }
-
     .panel {
       background: var(--card);
       border: 1px solid var(--border);
@@ -333,6 +327,8 @@
           id="jobInput"
           placeholder="วาง Job Ticket ที่นี่ เช่น
 
+MME_3720_031-[800]SitePriority=2(Main_Node-2)|3BB_Metronet CRC Error MME-3720-31_0/3/2 ME-3703-33_0/3/0
+
 ME_3802_048-3BB Link Down-[1].ME-3802-48_0/2/0__-__MME-3513-31_GigabitEthernet0/5/2
 
 ME_3101_033-3BB_Metronet CRC Error -ME-3101-33_V547 GigabitEthernet0-3-21 to DLM-DX_3101_206_01HW_V589_OFC-null + CRC ERROR
@@ -398,14 +394,15 @@ GE0/2/0(10G)    up    up    MME-3513-31(BKN)_link2_0/5/2_OFC"
           id="reportInput"
           placeholder="วางข้อความ Raw จาก display interface ที่นี่ เช่น
 
-GigabitEthernet0/3/0 current state : UP (ifindex: 6)
+[~MME-3720-31]display interface GigabitEthernet0/3/2
+GigabitEthernet0/3/2 current state : UP (ifindex: 9)
 Line protocol current state : UP
 Link quality grade : GOOD
-Description: MME-3720-31(MDH)_link1_0/3/2_OFC
-WaveLength: 1550nm, Transmission Distance: 80km
-Rx Power: -19.31dBm, Warning range: [-23.098, -7.002]dBm
-Tx Power: 2.50dBm, Warning range: [0.000, 4.999]dBm
-CRC: 3710 packets, Symbol: 317 packets"
+Description: ME-3703-33(MDH)_link1_0/3/0_OFC
+WaveLength: 1490nm, Transmission Distance: 80km
+Rx Power: -21.61dBm, Warning range: [-23.098, -7.002]dBm
+Tx Power: 3.47dBm, Warning range: [0.000, 4.999]dBm
+CRC: 213356 packets, Symbol: 18515 packets"
         ></textarea>
 
         <div class="buttons">
@@ -471,6 +468,11 @@ CRC: 3710 packets, Symbol: 317 packets"
       document.getElementById("reportResult").value = "";
     }
 
+    function clearAll() {
+      document.getElementById("jobInput").value = "";
+      document.getElementById("result").value = "";
+    }
+
     function clearResultOnly() {
       document.getElementById("result").value = "";
     }
@@ -505,64 +507,78 @@ CRC: 3710 packets, Symbol: 317 packets"
       output = decodeHtmlEntities(output);
       output = output.replace(/<br\s*\/?>/gi, "\n");
       output = output.replace(/<[^>]*>/g, "");
-      output = output.replace(/\r/g, "");
-      output = output.replace(/\n{3,}/g, "\n\n");
+      output = output.re*lace(/\r/g, "");
+      output = ou*put.replace(/\n{3,}/g, "\n\n");
 
-      return output.trim();
+ *    return output.trim();
     }
 
-    function cleanOutputText(text) {
-      return cleanText(text);
+ *  function cleanOutputText(text) {*      return cleanText(text);
+    *
+
+    function normalizeInterfaceT*pe(type) {
+      const upper = Str*ng(type || "").toUpperCase();
+
+   *  if (upper === "GE") return "Giga*itEthernet";
+      if (upper === "*IGABITETHERNET") return "GigabitEt*ernet";
+      if (upper === "10GE"* return "10GE";
+      if (upper ==* "25GE") return "25GE";
+      if (*pper === "40GE") return "40GE";
+  *   if (upper === "100GE") return "*00GE";
+      if (upper === "XGEI")*return "xgei";
+      if (upper ===*"XXVGEI") return "xxvgei";
+
+      *eturn type;
     }
 
-    function normalizeInterfaceType(type) {
-      const upper = String(type || "").toUpperCase();
+    function re*oveDuplicate(items) {
+      const *ap = new Map();
 
-      if (upper === "GE") return "GigabitEthernet";
-      if (upper === "GIGABITETHERNET") return "GigabitEthernet";
-      if (upper === "10GE") return "10GE";
-      if (upper === "25GE") return "25GE";
-      if (upper === "40GE") return "40GE";
-      if (upper === "100GE") return "100GE";
-      if (upper === "XGEI") return "xgei";
-      if (upper === "XXVGEI") return "xxvgei";
-
-      return type;
-    }
-
-    function removeDuplicate(items) {
-      const map = new Map();
-
-      items.forEach(function (item) {
-        const key = item.fullName || JSON.stringify(item);
-        map.set(key, item);
+      items.forEa*h(function (item) {
+        const *ey = item.fullName || JSON.stringi*y(item);
+        map.set(key, item*;
       });
 
-      return Array.from(map.values());
+      return Array.fr*m(map.values());
     }
 
-    function removeDuplicateLinks(links) {
-      const map = new Map();
+    functi*n removeDuplicateLinks(links) {
+  *   const map = new Map();
 
-      links.forEach(function (link) {
-        const localPort = link.localInterface
-          ? link.localInterface.fullName
-          : link.localPortRaw || "-";
+      l*nks.forEach(function (link) {
+    *   const localPort = link.localInt*rface
+          ? link.localInterf*ce.fullName
+          : link.local*ortRaw || "-";
 
-        const peerPort = link.peerInterface
-          ? link.peerInterface.fullName
-          : link.peerPortRaw || "-";
+        const peer*ort = link.peerInterface
+         *? link.peerInterface.fullName
+    *     : link.peerPortRaw || "-";
 
-        const key =
-          link.localDevice + "|" + localPort + "|" + link.peerDevice + "|" + peerPort;
+ *      const key =
+          link.l*calDevice +
+          "|" +
+      *   localPort +
+          "|" +
+   *      link.peerDevice +
+          *|" +
+          peerPort;
 
-        map.set(key, link);
+        *ap.set(key, link);
       });
 
-      return Array.from(map.values()).map(function (link, index) {
-        link.index = String(index + 1);
-        return link;
+    * return Array.from(map.values()).m*p(function (link, index) {
+       *link.index = String(index + 1);
+  *     return link;
       });
+    }
+
+    function hasValidInterface(localInterface) {
+      return (
+        localInterface &&
+        localInterface.fullName &&
+        localInterface.fullName !== "-" &&
+        getCliInterfaceName(localInterface) !== "-"
+      );
     }
 
     function parseInterfaceToken(token, defaultType) {
@@ -602,7 +618,7 @@ CRC: 3710 packets, Symbol: 317 packets"
         subPort,
         portOnly,
         fullName: `${type}${separator}${portOnly}`,
-        cliName: `${type}${separator}${portOnly}`,
+        cliName: `${type}${separator}${portOnly}`
       };
     }
 
@@ -635,7 +651,7 @@ CRC: 3710 packets, Symbol: 317 packets"
         portOnly,
         fullName: `${type}-${portOnly}`,
         cliName: `${type}-${portOnly}`,
-        rawPort: cleanPort,
+        rawPort: cleanPort
       };
     }
 
@@ -647,8 +663,8 @@ CRC: 3710 packets, Symbol: 317 packets"
 
       let match;
 
-      while ((match = interfaceRegex.exec(text)) !== null) {
-        const type = normalizeInterfaceType(match[1]);
+     *while ((match = interfaceRegex.exe*(text)) !== null) {
+        const *ype = normalizeInterfaceType(match*1]);
         const frame = match[2];
         const slot = match[3];
         const port = match[4];
@@ -659,7 +675,7 @@ CRC: 3710 packets, Symbol: 317 packets"
           slot,
           port,
           fullName: `${type} ${frame}/${slot}/${port}`,
-          cliName: `${type} ${frame}/${slot}/${port}`,
+          cliName: `${type} ${frame}/${slot}/${port}`
         });
       }
 
@@ -673,22 +689,21 @@ CRC: 3710 packets, Symbol: 317 packets"
       const lineRegex =
         /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
 
-      lines.forEach(function (line) {
-        const match = line.match(lineRegex);
-
+      lines.*orEach(function (line) {
+        c*nst match = line.match(lineRegex);*
         if (match) {
-          const rawType = match[1];
-          const portOnly = match[2];
-          const speed = match[3] || "";
-          const parts = portOnly.split("/");
+          co*st rawType = match[1];
+          c*nst portOnly = match[2];
+         *const speed = match[3] || "";
+    *     const parts = portOnly.split(*/");
 
-          let cliType = rawType;
+          let cliType = rawT*pe;
 
-          if (rawType === "GE") {
-            cliType = "GigabitEthernet";
+          if (rawType === "GE*) {
+            cliType = "Gigabit*thernet";
           }
 
-          interfaces.push({
+          i*terfaces.push({
             type: rawType,
             cliType,
             frame: parts[0],
@@ -698,7 +713,7 @@ CRC: 3710 packets, Symbol: 317 packets"
             fullName: speed
               ? `${rawType}${portOnly}(${speed})`
               : `${rawType}${portOnly}`,
-            cliName: `${cliType} ${portOnly}`,
+            cliName: `${cliType} ${portOnly}`
           });
         }
       });
@@ -716,7 +731,7 @@ CRC: 3710 packets, Symbol: 317 packets"
           frame: match[1],
           slot: match[2],
           port: match[3],
-          fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`,
+          fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`
         });
       }
 
@@ -765,7 +780,7 @@ CRC: 3710 packets, Symbol: 317 packets"
           peerDevice: match[4],
           peerPortRaw: match[5],
           peerInterface: parseInterfaceToken(match[5], "GigabitEthernet"),
-          sourceType: "ME_MULTI_LINK_TITLE",
+          sourceType: "ME_MULTI_LINK_TITLE"
         });
       }
 
@@ -775,11 +790,10 @@ CRC: 3710 packets, Symbol: 317 packets"
     function extractCrcTitleLinks(text) {
       const links = [];
       const clean = cleanText(text);
+      let match;
 
       const crcType1Regex =
         /-?(ME-\d+-\d+)(?:_V\d+)?\s+((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)\s+to\s+([A-Z0-9_-]+?)(?:_V\d+)?(?:_OFC-null|\s|\+|$)/gi;
-
-      let match;
 
       while ((match = crcType1Regex.exec(clean)) !== null) {
         links.push({
@@ -790,7 +804,7 @@ CRC: 3710 packets, Symbol: 317 packets"
           peerDevice: normalizeDeviceFromTitle(match[3]),
           peerPortRaw: "-",
           peerInterface: null,
-          sourceType: "METRONET_CRC_TO_OFC_NULL",
+          sourceType: "METRONET_CRC_TO_OFC_NULL"
         });
       }
 
@@ -806,7 +820,23 @@ CRC: 3710 packets, Symbol: 317 packets"
           peerDevice: normalizeDeviceFromTitle(match[3]),
           peerPortRaw: match[4],
           peerInterface: parseInterfaceToken(match[4], "GigabitEthernet"),
-          sourceType: "LINK_CRC_ERROR_BRACKET",
+          sourceType: "LINK_CRC_ERROR_BRACKET"
+        });
+      }
+
+      const crcType3Regex =
+        /3BB_Metronet\s+CRC\s+Error\s+(MME-\d+-\d+|ME-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)\s+(MME-\d+-\d+|ME-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)/gi;
+
+      while ((match = crcType3Regex.exec(clean)) !== null) {
+        links.push({
+          index: String(links.length + 1),
+          localDevice: normalizeDeviceFromTitle(match[1]),
+          localPortRaw: match[2],
+          localInterface: parseInterfaceToken(match[2], "GigabitEthernet"),
+          peerDevice: normalizeDeviceFromTitle(match[3]),
+          peerPortRaw: match[4],
+          peerInterface: parseInterfaceToken(match[4], "GigabitEthernet"),
+          sourceType: "METRONET_CRC_DEVICE_PORT_PAIR"
         });
       }
 
@@ -814,7 +844,25 @@ CRC: 3710 packets, Symbol: 317 packets"
     }
 
     function extractAdvancedLinks(text) {
-      return [];
+      const links = [];
+      const clean = cleanText(text);
+      let match;
+
+      const erpsOxRegex =
+        /([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)__-__([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)/gi;
+
+      while ((match = erpsOxRegex.exec(clean)) !== null) {
+        links.push({
+          index: String(links.length + 1),
+          localDevice: match[1],
+          localInterface: makeInterfaceObject("PORT", match[2]),
+          peerDevice: match[3],
+          peerInterface: makeInterfaceObject("PORT", match[4]),
+          sourceType: "ERPS_OX"
+        });
+      }
+
+      return removeDuplicateLinks(links);
     }
 
     function getCliInterfaceName(interfaceObj) {
@@ -871,10 +919,16 @@ CRC: 3710 packets, Symbol: 317 packets"
       return "-";
     }
 
+    function extractSitePriority(text) {
+      const match = text.match(/SitePriority\s*=\s*(\d+)/i);
+      return match ? match[1] : "-";
+    }
+
     function extractJobType(text) {
       if (/CRC/i.test(text)) return "CRC ERROR";
       if (/LINK DOWN/i.test(text)) return "LINK DOWN";
       if (/\bLOS\b/i.test(text)) return "LOS";
+      if (/ERPS\s+Loop\s+Broken/i.test(text)) return "ERPS LOOP BROKEN";
       if (/POWER|ไฟดับ/i.test(text)) return "POWER ALARM";
       if (/TEMP|TEMPERATURE/i.test(text)) return "TEMPERATURE ALARM";
       return "UNKNOWN";
@@ -942,43 +996,85 @@ ssh [username]@${cleanPeerDevice}
 `;
     }
 
-    function buildInterfaceDiscovery(localInterface, peerPort) {
-      let localPortOnly = "-";
-
-      if (localInterface && localInterface.frame) {
-        localPortOnly =
-          localInterface.portOnly ||
-          `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
-      }
-
-      let peerPortOnly = "-";
-
-      if (peerPort && peerPort !== "-") {
-        peerPortOnly = peerPort.replace(
-          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
-          ""
-        );
-      }
-
-      return `========================================
+    function buildInterfaceDiscovery(localInterface, peerPort, localDevice, peerDevice) {
+      let lines = `========================================
 INTERFACE DISCOVERY
 ========================================
 
-display interface description | include ${localPortOnly}
-display interface description | include ${peerPortOnly}
+`;
+
+      let hasDiscovery = false;
+
+      if (localInterface && localInterface.frame) {
+        const localPortOnly =
+          localInterface.portOnly ||
+          `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
+
+        if (localPortOnly && localPortOnly !== "-") {
+          lines += `display interface description | include ${localPortOnly}
+`;
+          hasDiscovery = true;
+        }
+      }
+
+      if (peerPort && peerPort !== "-") {
+        const peerPortOnly = peerPort.replace(
+          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
+          ""
+        );
+
+        if (peerPortOnly && peerPortOnly !== "-") {
+          lines += `display interface description | include ${peerPortOnly}
+`;
+          hasDiscovery = true;
+        }
+      }
+
+      if (!hasDiscovery) {
+        lines += `ไม่พบ Port สำหรับค้นหา Interface
+
+ให้ลองค้นหาจากชื่ออุปกรณ์:
+display interface description | include ${peerDevice || "-"}
+display interface description | include ${localDevice || "-"}
+
+`;
+      }
+
+      return lines;
+    }
+
+    function buildPortWarning(cliLocalPort) {
+      if (cliLocalPort !== "-") return "";
+
+      return `========================================
+WARNING
+========================================
+
+ระบบพบชื่ออุปกรณ์และประเภทงานแล้ว แต่ยังไม่พบ Interface / Port
+
+กรุณาเพิ่มข้อมูล เช่น:
+- GigabitEthernet0/3/2
+- GigabitEthernet0/3/0
+- หรือวางผล display interface / display interface description
+
 `;
     }
 
     function buildMeCommands(localInterface, jobType) {
       let commands = "";
 
-      if (localInterface && localInterface.fullName) {
+      if (hasValidInterface(localInterface)) {
         const ifName = getCliInterfaceName(localInterface);
 
         commands += `display interface ${ifName}
 
 # Optional หากมีสิทธิ์
 # display current-configuration interface ${ifName}
+
+`;
+      } else {
+        commands += `# ไม่พบ Interface จาก Job Ticket
+# กรุณาระบุ Port หรือวางผล display interface เพิ่มเติม
 
 `;
       }
@@ -993,9 +1089,7 @@ display interface description
     }
 
     function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
-      let commands = "";
-
-      commands += `display board 0/[slot]
+      return `display board 0/[slot]
 display lldp neighbor brief
 display alarm active
 display logbuffer
@@ -1003,11 +1097,32 @@ display logbuffer
 interface emu 1
 display power run info
 `;
-
-      return commands;
     }
 
     function buildWhatToCheck(localPort, jobType, mode) {
+      const hasPort = localPort && localPort !== "-";
+
+      if (!hasPort) {
+        return `========================================
+WHAT TO CHECK
+========================================
+
+ไม่พบ Interface ที่ต้องตรวจสอบ
+
+ให้ตรวจสอบเพิ่ม:
+1. หา Port จาก Job Ticket
+2. รัน display interface description
+3. ค้นหา Description ด้วยชื่อ Peer Device
+4. วางผล display interface เพิ่มใน Report Converter
+
+คำสั่งพื้นฐาน:
+display interface description
+display lldp neighbor brief
+display alarm active
+display logbuffer
+`;
+      }
+
       return `========================================
 WHAT TO CHECK
 ========================================
@@ -1027,6 +1142,24 @@ display logbuffer
     }
 
     function buildJobMethod(localPort, jobType, mode) {
+      const hasPort = localPort && localPort !== "-";
+
+      if (!hasPort) {
+        return `========================================
+CHECK METHOD
+========================================
+
+ยังไม่พบ Interface จึงยังไม่สามารถตรวจ CRC จาก Port ได้
+
+ขั้นตอนที่ควรทำ:
+1. หา Interface จาก Job Ticket หรือ Description
+2. รัน display interface description
+3. ยืนยัน Local Port จริง
+4. จากนั้นรัน display interface [PORT]
+5. จดค่า CRC / Symbol และเทียบหลัง 3-5 นาที
+`;
+      }
+
       if (jobType === "CRC ERROR") {
         return `========================================
 CRC CHECK METHOD
@@ -1048,6 +1181,44 @@ GENERAL CHECK METHOD
 2. ตรวจ Alarm
 3. ตรวจ Log
 4. ตรวจ Description
+`;
+    }
+
+    function buildRecommendation(jobType, mode, cliLocalPort) {
+      if (cliLocalPort === "-") {
+        return `ระบบยังไม่สามารถสรุปค่า CRC ของ Port ได้ เพราะไม่พบ Interface
+
+คำแนะนำ:
+- หา Local Port ก่อน
+- ใช้ display interface description ค้นหาด้วยชื่อ Peer
+- ถ้ามี Raw Output จาก display interface ให้ใช้หน้า Report Converter
+`;
+      }
+
+      if (jobType === "CRC ERROR") {
+        return `Priority Check ME
+
+1. Interface Status
+2. RX/TX Power
+3. CRC / Symbol Counter
+4. Alarm
+5. Log
+
+Possible Cause:
+- Fiber Loss
+- Patch Cord
+- Connector
+- SFP
+- Link Flap
+`;
+      }
+
+      return `Priority Check
+
+1. Alarm
+2. Log
+3. Interface Description
+4. Interface Status
 `;
     }
 
@@ -1094,7 +1265,7 @@ SAFETY NOTE
     }
 
     function buildPortBounce(localInterface, mode, oltModel) {
-      if (!localInterface || !localInterface.fullName) {
+      if (!hasValidInterface(localInterface)) {
         return "ไม่พบ Local Port จึงยังไม่แนะนำ shutdown / undo shutdown";
       }
 
@@ -1104,34 +1275,6 @@ system-view
 interface ${getCliInterfaceName(localInterface)}
 shutdown
 undo shutdown`;
-    }
-
-    function buildRecommendation(jobType, mode) {
-      if (jobType === "CRC ERROR") {
-        return `Priority Check ME
-
-1. Interface Status
-2. RX/TX Power
-3. CRC / Symbol Counter
-4. Alarm
-5. Log
-
-Possible Cause:
-- Fiber Loss
-- Patch Cord
-- Connector
-- SFP
-- Link Flap
-`;
-      }
-
-      return `Priority Check
-
-1. Alarm
-2. Log
-3. Interface Description
-4. Interface Status
-`;
     }
 
     function analyzeJob(mode) {
@@ -1149,6 +1292,7 @@ Possible Cause:
         const severity = extractSeverity(text);
         const service = extractService(text);
         const jobType = extractJobType(text);
+        const sitePriority = extractSitePriority(text);
         const oltModel = detectOltModel(text);
 
         const titleLinksFromMe = extractTitleLinks(text);
@@ -1187,7 +1331,7 @@ Possible Cause:
         } else if (firstTitleLink) {
           physicalInterfaces = [
             firstTitleLink.localInterface,
-            firstTitleLink.peerInterface,
+            firstTitleLink.peerInterface
           ].filter(Boolean);
         } else {
           physicalInterfaces = extractInterfaces(text);
@@ -1208,14 +1352,21 @@ Possible Cause:
           peerPort = extractPeerPortFromLink(text);
         }
 
+        const portWarning = buildPortWarning(cliLocalPort);
         const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
-        const interfaceDiscovery = buildInterfaceDiscovery(localInterface, peerPort);
+        const interfaceDiscovery = buildInterfaceDiscovery(
+          localInterface,
+          peerPort,
+          localDevice,
+          peerDevice
+        );
+
         const commands =
           mode === "OLT"
             ? buildOltCommands(localInterface, [], jobType, oltModel)
             : buildMeCommands(localInterface, jobType);
 
-        const recommendation = buildRecommendation(jobType, mode);
+        const recommendation = buildRecommendation(jobType, mode, cliLocalPort);
         const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
         const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
         const valueGuide = buildValueGuide();
@@ -1245,6 +1396,9 @@ ${mode}
 JOB TYPE :
 ${jobType}
 
+SITE PRIORITY :
+${sitePriority}
+
 LOCAL DEVICE :
 ${localDevice}
 
@@ -1259,6 +1413,8 @@ ${peerDevice}
 
 PEER PORT :
 ${peerPort}
+
+${portWarning}
 
 ${titleLinksSummary}
 
@@ -1348,7 +1504,7 @@ ${safetyNote}
           currentBlock = {
             device: promptMatch[1].replace(/_V\d+.*/i, ""),
             commandInterface: normalizeIfNameForReport(promptMatch[2]),
-            rawLines: [trimmed],
+            rawLines: [trimmed]
           };
 
           return;
@@ -1366,7 +1522,7 @@ ${safetyNote}
           currentBlock = {
             device: extractDeviceFromPrompt(clean),
             commandInterface: normalizeIfNameForReport(interfaceStart[1]),
-            rawLines: [trimmed],
+            rawLines: [trimmed]
           };
 
           return;
@@ -1459,7 +1615,7 @@ ${safetyNote}
         crc: crcMatch ? crcMatch[1] : "-",
         symbol: crcMatch ? crcMatch[2] : "-",
         peerDevice: peerDevice,
-        peerPort: peerPort,
+        peerPort: peerPort
       };
     }
 
@@ -1562,11 +1718,6 @@ CRC: ${block.crc} packets, Symbol: ${block.symbol} packets`;
       });
 
       result.value = cleanOutputText(output);
-    }
-
-    function clearAll() {
-      document.getElementById("jobInput").value = "";
-      document.getElementById("result").value = "";
     }
   </script>
 </body>
