@@ -1,150 +1,333 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Huawei NOC / OLT Assistant</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Huawei NOC / OLT Assistant</title>
 
-    <style>
-      .report {
-        background: linear-gradient(135deg, #8e24aa, #4a148c);
-      }
+  <style>
+    :root {
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --primary: #1565c0;
+      --primary-dark: #0d47a1;
+      --orange: #ef6c00;
+      --purple: #6a1b9a;
+      --red: #c62828;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d8dee9;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+      --radius: 18px;
+    }
 
-      .report::after {
-        content: '📝';
-      }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(21, 101, 192, 0.15), transparent 30%),
+        linear-gradient(135deg, #eef3f9, #f8fafc);
+      padding: 24px;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1380px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      padding: 26px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 6px 4px 22px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1976d2, #0d47a1);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 26px;
+      box-shadow: 0 10px 24px rgba(21, 101, 192, 0.35);
+    }
+
+    .brand-title h1 {
+      margin: 0;
+      font-size: 34px;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    .brand-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #111827;
+      margin: 0;
+    }
+
+    .panel-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid #cfd8e3;
+      border-radius: 14px;
+      padding: 16px;
+      box-sizing: border-box;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: vertical;
+      font-family: Consolas, "Cascadia Mono", "Segoe UI", monospace;
+      color: #1f2937;
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+      outline: none;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12);
+    }
+
+    #jobInput {
+      min-height: 250px;
+    }
+
+    #result,
+    #reportResult {
+      min-height: 620px;
+      background: #0f172a;
+      color: #dbeafe;
+      border-color: #1e293b;
+      font-size: 13px;
+    }
+
+    #reportInput {
+      min-height: 360px;
+    }
+
+    #reportResult {
+      min-height: 520px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    button {
+      position: relative;
+      overflow: hidden;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      min-height: 52px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
+      filter: brightness(1.03);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+    }
+
+    .me {
+      background: linear-gradient(135deg, #2196f3, #0d47a1);
+    }
+
+    .olt {
+      background: linear-gradient(135deg, #ff9800, #e65100);
+    }
+
+    .report {
+      background: linear-gradient(135deg, #8e24aa, #4a148c);
+    }
+
+    .clear {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: #334155;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      min-height: auto;
+      box-shadow: none;
+    }
+
+    .mini-btn:hover {
+      transform: none;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
       body {
-        font-family: 'Segoe UI', sans-serif;
-        background: #f4f6f9;
-        padding: 20px;
-        margin: 0;
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: auto;
+        padding: 12px;
       }
 
       .card {
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 18px;
       }
 
-      h1 {
-        text-align: center;
-        color: #1976d2;
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      h3 {
-        color: #222;
-      }
-
-      textarea {
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 12px;
-        box-sizing: border-box;
-        font-size: 14px;
-        line-height: 1.5;
-        resize: vertical;
-        font-family: Consolas, 'Segoe UI', monospace;
-      }
-
-      #jobInput {
-        min-height: 220px;
-      }
-
-      #result {
-        min-height: 780px;
-        white-space: pre;
+      .brand-title h1 {
+        font-size: 28px;
       }
 
       .buttons {
-        display: flex;
-        gap: 10px;
-        margin: 15px 0;
+        grid-template-columns: 1fr;
       }
 
-      button {
-        position: relative;
-        overflow: hidden;
-        flex: 1;
-        border: none;
-        border-radius: 8px;
-        padding: 12px;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 15px;
-        transition: all 0.25s ease;
+      .hint {
+        white-space: normal;
       }
+    }
+  </style>
+</head>
 
-      .me {
-        background: linear-gradient(135deg, #2196f3, #0d47a1);
-      }
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="app-header">
+        <div class="brand">
+          <div class="brand-icon">🔧</div>
+          <div class="brand-title">
+            <h1>Huawei Assistant</h1>
+            <p>NOC_ME / OLT / Report Converter Toolkit</p>
+          </div>
+        </div>
 
-      .olt {
-        background: linear-gradient(135deg, #ff9800, #e65100);
-      }
+        <div class="status-pill">● Tool Ready</div>
+      </div>
 
-      .clear {
-        background: linear-gradient(135deg, #f44336, #b71c1c);
-      }
-
-      button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-        opacity: 0.95;
-        padding-right: 42px;
-      }
-
-      button:active {
-        transform: translateY(0);
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-      }
-
-      button::after {
-        position: absolute;
-        right: 18px;
-        opacity: 0;
-        transform: translateX(12px);
-        transition: all 0.25s ease;
-      }
-
-      .me::after {
-        content: '🌐';
-      }
-
-      .olt::after {
-        content: '🟠';
-      }
-
-      .clear::after {
-        content: '🧹';
-      }
-
-      button:hover::after {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      @media (max-width: 768px) {
-        .buttons {
-          flex-direction: column;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class="card">
-        <h1>🔧 Huawei Assistant</h1>
-
-        <h3>📥 Job Ticket</h3>
+      <div class="panel" id="mainInputPanel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">📥 Job Ticket</h3>
+            <div class="panel-subtitle">
+              วาง Job Ticket, Title, หรือ Output จากอุปกรณ์เพื่อวิเคราะห์
+            </div>
+          </div>
+          <div class="hint">ME / OLT / CRC / Link Down / Report</div>
+        </div>
 
         <textarea
           id="jobInput"
@@ -173,1120 +356,1218 @@ GE0/2/0(10G)    up    up    MME-3513-31(BKN)_link2_0/5/2_OFC"
             📝 Report Converter
           </button>
 
-          <button class="clear" onclick="clearAll()">🗑 Clear</button>
-        </div>
-        <h3>📄 Result</h3>
-
-        <textarea id="result"></textarea>
-        <div id="reportPage" style="display: none">
-          <h3>📝 Report Converter</h3>
-
-          <textarea
-            id="reportInput"
-            placeholder="วางข้อความ Raw จาก display interface ที่นี่"
-            style="min-height: 360px"
-          ></textarea>
-
-          <div class="buttons">
-            <button class="report" onclick="convertReportText()">
-              🔄 แปลงรายงาน
-            </button>
-
-            <button class="clear" onclick="clearReport()">
-              🗑 Clear Report
-            </button>
-
-            <button class="me" onclick="showMainPage()">
-              🔙 กลับหน้า Assistant
-            </button>
-          </div>
-
-          <h3>📄 Report Result</h3>
-
-          <textarea id="reportResult" style="min-height: 520px"></textarea>
+          <button class="clear" onclick="clearAll()">
+            🗑 Clear
+          </button>
         </div>
       </div>
+
+      <div class="panel" id="mainResultPanel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">📄 Result</h3>
+            <div class="panel-subtitle">
+              ผลลัพธ์คำสั่งและแนวทางตรวจสอบ
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button class="mini-btn" onclick="copyText('result')">📋 Copy</button>
+            <button class="mini-btn" onclick="clearResultOnly()">🧹 Clear Result</button>
+          </div>
+        </div>
+
+        <textarea id="result"></textarea>
+      </div>
+
+      <div id="reportPage" class="panel" style="display: none;">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">📝 Report Converter</h3>
+            <div class="panel-subtitle">
+              แปลง Raw Output จาก display interface เป็นรายงานสั้น
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button class="mini-btn" onclick="copyText('reportResult')">📋 Copy Report</button>
+          </div>
+        </div>
+
+        <textarea
+          id="reportInput"
+          placeholder="วางข้อความ Raw จาก display interface ที่นี่ เช่น
+
+GigabitEthernet0/3/0 current state : UP (ifindex: 6)
+Line protocol current state : UP
+Link quality grade : GOOD
+Description: MME-3720-31(MDH)_link1_0/3/2_OFC
+WaveLength: 1550nm, Transmission Distance: 80km
+Rx Power: -19.31dBm, Warning range: [-23.098, -7.002]dBm
+Tx Power: 2.50dBm, Warning range: [0.000, 4.999]dBm
+CRC: 3710 packets, Symbol: 317 packets"
+        ></textarea>
+
+        <div class="buttons">
+          <button class="report" onclick="convertReportText()">
+            🔄 แปลงรายงาน
+          </button>
+
+          <button class="clear" onclick="clearReport()">
+            🗑 Clear Report
+          </button>
+
+          <button class="me" onclick="showMainPage()">
+            🔙 กลับหน้า Assistant
+          </button>
+        </div>
+
+        <h3 class="panel-title">📄 Report Result</h3>
+        <textarea id="reportResult"></textarea>
+      </div>
+
+      <div class="footer-note">
+        Huawei Assistant Toolkit • NOC_ME / OLT / Report Converter
+      </div>
     </div>
+  </div>
 
-    <script>
-      function checkFactoryAuth() {
-        const auth = JSON.parse(localStorage.getItem('factoryAuth'));
+  <script>
+    function checkFactoryAuth() {
+      const auth = JSON.parse(localStorage.getItem("factoryAuth"));
 
-        if (!auth) {
-          location.replace(
-            'https://pongthepstar8-web.github.io/tool-launcher/'
-          );
-          return false;
-        }
-
-        const expireTime = 8 * 60 * 60 * 1000;
-
-        if (Date.now() - auth.loginTime > expireTime) {
-          localStorage.clear();
-          location.replace(
-            'https://pongthepstar8-web.github.io/tool-launcher/'
-          );
-          return false;
-        }
-
-        return true;
+      if (!auth) {
+        location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
+        return false;
       }
 
-      checkFactoryAuth();
+      const expireTime = 8 * 60 * 60 * 1000;
 
-      function showReportPage() {
-        document.getElementById('jobInput').style.display = 'none';
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('reportPage').style.display = 'block';
+      if (Date.now() - auth.loginTime > expireTime) {
+        localStorage.clear();
+        location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
+        return false;
       }
 
-      function showMainPage() {
-        document.getElementById('jobInput').style.display = 'block';
-        document.getElementById('result').style.display = 'block';
-        document.getElementById('reportPage').style.display = 'none';
+      return true;
+    }
+
+    checkFactoryAuth();
+
+    function showReportPage() {
+      document.getElementById("mainInputPanel").style.display = "none";
+      document.getElementById("mainResultPanel").style.display = "none";
+      document.getElementById("reportPage").style.display = "block";
+    }
+
+    function showMainPage() {
+      document.getElementById("mainInputPanel").style.display = "block";
+      document.getElementById("mainResultPanel").style.display = "block";
+      document.getElementById("reportPage").style.display = "none";
+    }
+
+    function clearReport() {
+      document.getElementById("reportInput").value = "";
+      document.getElementById("reportResult").value = "";
+    }
+
+    function clearResultOnly() {
+      document.getElementById("result").value = "";
+    }
+
+    function copyText(elementId) {
+      const box = document.getElementById(elementId);
+
+      if (!box || !box.value.trim()) {
+        alert("ยังไม่มีข้อความให้ Copy");
+        return;
       }
 
-      function clearReport() {
-        document.getElementById('reportInput').value = '';
-        document.getElementById('reportResult').value = '';
-      }
+      navigator.clipboard.writeText(box.value).then(function () {
+        alert("Copy เรียบร้อยแล้ว");
+      });
+    }
 
-      function decodeHtmlEntities(text) {
-        const textarea = document.createElement('textarea');
-        textarea.innerHTML = text;
-        return textarea.value;
-      }
+    function decodeHtmlEntities(text) {
+      const textarea = document.createElement("textarea");
+      textarea.innerHTML = text;
+      return textarea.value;
+    }
 
-      function cleanText(text) {
-        let output = String(text || '');
+    function cleanText(text) {
+      let output = String(text || "");
 
-        output = output
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/&lt;br\s*\/?&gt;/gi, '\n')
-          .replace(/&amp;lt;br\s*\/?&amp;gt;/gi, '\n');
+      output = output
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/&lt;br\s*\/?&gt;/gi, "\n")
+        .replace(/&amp;lt;br\s*\/?&amp;gt;/gi, "\n");
 
-        output = decodeHtmlEntities(output);
-        output = output.replace(/<br\s*\/?>/gi, '\n');
-        output = output.replace(/<[^>]*>/g, '');
-        output = output.replace(/\r/g, '');
-        output = output.replace(/\n{3,}/g, '\n\n');
+      output = decodeHtmlEntities(output);
+      output = output.replace(/<br\s*\/?>/gi, "\n");
+      output = output.replace(/<[^>]*>/g, "");
+      output = output.replace(/\r/g, "");
+      output = output.replace(/\n{3,}/g, "\n\n");
 
-        return output.trim();
-      }
+      return output.trim();
+    }
 
-      function cleanOutputText(text) {
-        return cleanText(text);
-      }
+    function cleanOutputText(text) {
+      return cleanText(text);
+    }
 
-      function normalizeInterfaceType(type) {
-        const upper = String(type || '').toUpperCase();
+    function normalizeInterfaceType(type) {
+      const upper = String(type || "").toUpperCase();
 
-        if (upper === 'GE') return 'GigabitEthernet';
-        if (upper === 'GIGABITETHERNET') return 'GigabitEthernet';
-        if (upper === '10GE') return '10GE';
-        if (upper === '25GE') return '25GE';
-        if (upper === '40GE') return '40GE';
-        if (upper === '100GE') return '100GE';
-        if (upper === 'XGEI') return 'xgei';
-        if (upper === 'XXVGEI') return 'xxvgei';
+      if (upper === "GE") return "GigabitEthernet";
+      if (upper === "GIGABITETHERNET") return "GigabitEthernet";
+      if (upper === "10GE") return "10GE";
+      if (upper === "25GE") return "25GE";
+      if (upper === "40GE") return "40GE";
+      if (upper === "100GE") return "100GE";
+      if (upper === "XGEI") return "xgei";
+      if (upper === "XXVGEI") return "xxvgei";
 
-        return type;
-      }
+      return type;
+    }
 
-      function removeDuplicate(items) {
-        const map = new Map();
+    function removeDuplicate(items) {
+      const map = new Map();
 
-        items.forEach(function (item) {
-          const key = item.fullName || JSON.stringify(item);
-          map.set(key, item);
-        });
+      items.forEach(function (item) {
+        const key = item.fullName || JSON.stringify(item);
+        map.set(key, item);
+      });
 
-        return Array.from(map.values());
-      }
+      return Array.from(map.values());
+    }
 
-      function removeDuplicateLinks(links) {
-        const map = new Map();
+    function removeDuplicateLinks(links) {
+      const map = new Map();
 
-        links.forEach(function (link) {
-          const localPort = link.localInterface
-            ? link.localInterface.fullName
-            : link.localPortRaw || '-';
+      links.forEach(function (link) {
+        const localPort = link.localInterface
+          ? link.localInterface.fullName
+          : link.localPortRaw || "-";
 
-          const peerPort = link.peerInterface
-            ? link.peerInterface.fullName
-            : link.peerPortRaw || '-';
+        const peerPort = link.peerInterface
+          ? link.peerInterface.fullName
+          : link.peerPortRaw || "-";
 
-          const key =
-            link.localDevice +
-            '|' +
-            localPort +
-            '|' +
-            link.peerDevice +
-            '|' +
-            peerPort;
+        const key =
+          link.localDevice + "|" + localPort + "|" + link.peerDevice + "|" + peerPort;
 
-          map.set(key, link);
-        });
+        map.set(key, link);
+      });
 
-        return Array.from(map.values()).map(function (link, index) {
-          link.index = String(index + 1);
-          return link;
-        });
-      }
+      return Array.from(map.values()).map(function (link, index) {
+        link.index = String(index + 1);
+        return link;
+      });
+    }
 
-      function parseInterfaceToken(token, defaultType) {
-        if (!token) return null;
+    function parseInterfaceToken(token, defaultType) {
+      if (!token) return null;
 
-        const cleanToken = String(token).trim().replace(/[()]/g, '');
+      const cleanToken = String(token).trim().replace(/[()]/g, "");
 
-        const match = cleanToken.match(
-          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE|xgei|xxvgei)?\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)(?:\s*[\/_-]\s*(\d+))?$/i
-        );
+      const match = cleanToken.match(
+        /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE|xgei|xxvgei)?\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)(?:\s*[\/_-]\s*(\d+))?$/i
+      );
 
-        if (!match) return null;
+      if (!match) return null;
 
-        let type = match[1] || defaultType || 'GigabitEthernet';
+      let type = match[1] || defaultType || "GigabitEthernet";
 
-        if (/^GE$/i.test(type)) type = 'GigabitEthernet';
-        if (/^GigabitEthernet$/i.test(type)) type = 'GigabitEthernet';
-        if (/^xgei$/i.test(type)) type = 'xgei';
-        if (/^xxvgei$/i.test(type)) type = 'xxvgei';
+      if (/^GE$/i.test(type)) type = "GigabitEthernet";
+      if (/^GigabitEthernet$/i.test(type)) type = "GigabitEthernet";
+      if (/^xgei$/i.test(type)) type = "xgei";
+      if (/^xxvgei$/i.test(type)) type = "xxvgei";
 
-        const frame = match[2];
-        const slot = match[3];
-        const port = match[4];
-        const subPort = match[5] || '';
+      const frame = match[2];
+      const slot = match[3];
+      const port = match[4];
+      const subPort = match[5] || "";
 
-        const portOnly = subPort
+      const portOnly = subPort
+        ? `${frame}/${slot}/${port}/${subPort}`
+        : `${frame}/${slot}/${port}`;
+
+      const separator = type === "xgei" || type === "xxvgei" ? "-" : " ";
+
+      return {
+        type,
+        frame,
+        slot,
+        port,
+        subPort,
+        portOnly,
+        fullName: `${type}${separator}${portOnly}`,
+        cliName: `${type}${separator}${portOnly}`,
+      };
+    }
+
+    function makeInterfaceObject(type, portText) {
+      if (!portText) return null;
+
+      const cleanPort = String(portText)
+        .replace(/_/g, "/")
+        .replace(/-/g, "/")
+        .trim();
+
+      const parts = cleanPort.split("/");
+
+      const frame = parts[0] || "";
+      const slot = parts[1] || "";
+      const port = parts[2] || "";
+      const subPort = parts[3] || "";
+
+      const portOnly =
+        subPort !== ""
           ? `${frame}/${slot}/${port}/${subPort}`
           : `${frame}/${slot}/${port}`;
 
-        const separator = type === 'xgei' || type === 'xxvgei' ? '-' : ' ';
+      return {
+        type,
+        frame,
+        slot,
+        port,
+        subPort,
+        portOnly,
+        fullName: `${type}-${portOnly}`,
+        cliName: `${type}-${portOnly}`,
+        rawPort: cleanPort,
+      };
+    }
 
-        return {
+    function extractInterfaces(text) {
+      const interfaces = [];
+
+      const interfaceRegex =
+        /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
+
+      let match;
+
+      while ((match = interfaceRegex.exec(text)) !== null) {
+        const type = normalizeInterfaceType(match[1]);
+        const frame = match[2];
+        const slot = match[3];
+        const port = match[4];
+
+        interfaces.push({
           type,
           frame,
           slot,
           port,
-          subPort,
-          portOnly,
-          fullName: `${type}${separator}${portOnly}`,
-          cliName: `${type}${separator}${portOnly}`,
-        };
+          fullName: `${type} ${frame}/${slot}/${port}`,
+          cliName: `${type} ${frame}/${slot}/${port}`,
+        });
       }
 
-      function makeInterfaceObject(type, portText) {
-        if (!portText) return null;
+      return removeDuplicate(interfaces);
+    }
 
-        const cleanPort = String(portText)
-          .replace(/_/g, '/')
-          .replace(/-/g, '/')
-          .trim();
+    function extractInterfacesFromDescription(text) {
+      const interfaces = [];
+      const lines = cleanText(text).split(/\r?\n/);
 
-        const parts = cleanPort.split('/');
+      const lineRegex =
+        /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
 
-        const frame = parts[0] || '';
-        const slot = parts[1] || '';
-        const port = parts[2] || '';
-        const subPort = parts[3] || '';
+      lines.forEach(function (line) {
+        const match = line.match(lineRegex);
 
-        const portOnly =
-          subPort !== ''
-            ? `${frame}/${slot}/${port}/${subPort}`
-            : `${frame}/${slot}/${port}`;
+        if (match) {
+          const rawType = match[1];
+          const portOnly = match[2];
+          const speed = match[3] || "";
+          const parts = portOnly.split("/");
 
-        return {
-          type,
-          frame,
-          slot,
-          port,
-          subPort,
-          portOnly,
-          fullName: `${type}-${portOnly}`,
-          cliName: `${type}-${portOnly}`,
-          rawPort: cleanPort,
-        };
-      }
+          let cliType = rawType;
 
-      function extractInterfaces(text) {
-        const interfaces = [];
-
-        const interfaceRegex =
-          /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
-
-        let match;
-
-        while ((match = interfaceRegex.exec(text)) !== null) {
-          const type = normalizeInterfaceType(match[1]);
-          const frame = match[2];
-          const slot = match[3];
-          const port = match[4];
+          if (rawType === "GE") {
+            cliType = "GigabitEthernet";
+          }
 
           interfaces.push({
-            type,
-            frame,
-            slot,
-            port,
-            fullName: `${type} ${frame}/${slot}/${port}`,
-            cliName: `${type} ${frame}/${slot}/${port}`,
+            type: rawType,
+            cliType,
+            frame: parts[0],
+            slot: parts[1],
+            port: parts[2],
+            speed,
+            fullName: speed
+              ? `${rawType}${portOnly}(${speed})`
+              : `${rawType}${portOnly}`,
+            cliName: `${cliType} ${portOnly}`,
           });
         }
+      });
 
-        return removeDuplicate(interfaces);
-      }
+      return removeDuplicate(interfaces);
+    }
 
-      function extractInterfacesFromDescription(text) {
-        const interfaces = [];
-        const lines = cleanText(text).split(/\r?\n/);
+    function extractGponPorts(text) {
+      const ports = [];
+      const regex = /GPON\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
+      let match;
 
-        const lineRegex =
-          /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
-
-        lines.forEach(function (line) {
-          const match = line.match(lineRegex);
-
-          if (match) {
-            const rawType = match[1];
-            const portOnly = match[2];
-            const speed = match[3] || '';
-            const parts = portOnly.split('/');
-
-            let cliType = rawType;
-
-            if (rawType === 'GE') {
-              cliType = 'GigabitEthernet';
-            }
-
-            interfaces.push({
-              type: rawType,
-              cliType,
-              frame: parts[0],
-              slot: parts[1],
-              port: parts[2],
-              speed,
-              fullName: speed
-                ? `${rawType}${portOnly}(${speed})`
-                : `${rawType}${portOnly}`,
-              cliName: `${cliType} ${portOnly}`,
-            });
-          }
+      while ((match = regex.exec(text)) !== null) {
+        ports.push({
+          frame: match[1],
+          slot: match[2],
+          port: match[3],
+          fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`,
         });
-
-        return removeDuplicate(interfaces);
       }
 
-      function normalizeDeviceFromTitle(deviceName) {
-        if (!deviceName) return '-';
+      return removeDuplicate(ports);
+    }
 
-        return String(deviceName)
-          .replace(/_V\d+.*/i, '')
-          .replace(/\s+/g, '')
-          .trim();
+    function normalizeDeviceFromTitle(deviceName) {
+      if (!deviceName) return "-";
+
+      return String(deviceName)
+        .replace(/_V\d+.*/i, "")
+        .replace(/\s+/g, "")
+        .trim();
+    }
+
+    function extractDevices(text) {
+      const devices = [];
+
+      const deviceRegex =
+        /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|DLM-DX_[A-Z0-9_]+|RAG_[A-Z0-9]+|RAC_[A-Z0-9]+|NMA_[A-Z0-9_]+|NE_[A-Z0-9_]+|OX_[A-Z0-9_]+|OLT[-_A-Z0-9]*)/gi;
+
+      let match;
+
+      while ((match = deviceRegex.exec(text)) !== null) {
+        devices.push(match[1]);
       }
 
-      function extractDevices(text) {
-        const devices = [];
+      return Array.from(new Set(devices));
+    }
 
-        const deviceRegex =
-          /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|DLM-DX_[A-Z0-9_]+|RAG_[A-Z0-9]+|RAC_[A-Z0-9]+|NMA_[A-Z0-9_]+|NE_[A-Z0-9_]+|OX_[A-Z0-9_]+|OLT[-_A-Z0-9]*)/gi;
+    function extractTitleLinks(text) {
+      const links = [];
+      const clean = cleanText(text);
 
-        let match;
+      const regex =
+        /\[(\d+)\]\.([A-Z]+-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)__-__([A-Z]+-\d+-\d+(?:\([A-Z]+\))?)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?[0-9]+[\/_-][0-9]+[\/_-][0-9]+)/gi;
 
-        while ((match = deviceRegex.exec(text)) !== null) {
-          devices.push(match[1]);
-        }
+      let match;
 
-        return Array.from(new Set(devices));
-      }
-
-      function extractTitleLinks(text) {
-        const links = [];
-        const clean = cleanText(text);
-
-        const regex =
-          /\[(\d+)\]\.([A-Z]+-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)__-__([A-Z]+-\d+-\d+(?:\([A-Z]+\))?)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?[0-9]+[\/_-][0-9]+[\/_-][0-9]+)/gi;
-
-        let match;
-
-        while ((match = regex.exec(clean)) !== null) {
-          links.push({
-            index: match[1],
-            localDevice: match[2],
-            localPortRaw: match[3],
-            localInterface: parseInterfaceToken(match[3], 'GigabitEthernet'),
-            peerDevice: match[4],
-            peerPortRaw: match[5],
-            peerInterface: parseInterfaceToken(match[5], 'GigabitEthernet'),
-            sourceType: 'ME_MULTI_LINK_TITLE',
-          });
-        }
-
-        return removeDuplicateLinks(links);
-      }
-
-      function extractCrcTitleLinks(text) {
-        const links = [];
-        const clean = cleanText(text);
-
-        const crcType1Regex =
-          /-?(ME-\d+-\d+)(?:_V\d+)?\s+((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)\s+to\s+([A-Z0-9_-]+?)(?:_V\d+)?(?:_OFC-null|\s|\+|$)/gi;
-
-        let match;
-
-        while ((match = crcType1Regex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localPortRaw: match[2],
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerPortRaw: '-',
-            peerInterface: null,
-            sourceType: 'METRONET_CRC_TO_OFC_NULL',
-          });
-        }
-
-        const crcType2Regex =
-          /Link\s+CRC\s+Error\s+(ME-\d+-\d+)(?:_V\d+)?\s*\(((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\d+[\/_-]\d+[\/_-]\d+)\)\s+to\s+(ME-\d+-\d+)(?:_V\d+)?\s*\(((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\d+[\/_-]\d+[\/_-]\d+)\)/gi;
-
-        while ((match = crcType2Regex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localPortRaw: match[2],
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerPortRaw: match[4],
-            peerInterface: parseInterfaceToken(match[4], 'GigabitEthernet'),
-            sourceType: 'LINK_CRC_ERROR_BRACKET',
-          });
-        }
-
-        return removeDuplicateLinks(links);
-      }
-
-      function extractAdvancedLinks(text) {
-        return [];
-      }
-
-      function getCliInterfaceName(interfaceObj) {
-        if (!interfaceObj) return '-';
-
-        if (interfaceObj.cliName) {
-          return interfaceObj.cliName;
-        }
-
-        const portOnly =
-          interfaceObj.portOnly ||
-          `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
-
-        if (interfaceObj.type === 'GE') {
-          return `GigabitEthernet ${portOnly}`;
-        }
-
-        if (interfaceObj.type === 'GigabitEthernet') {
-          return `GigabitEthernet ${portOnly}`;
-        }
-
-        return interfaceObj.cliName || interfaceObj.fullName;
-      }
-
-      function extractTicket(text) {
-        const match =
-          text.match(/JB\d+-\d+/i) ||
-          text.match(/INC\d+/i) ||
-          text.match(/TT\d+/i) ||
-          text.match(/WO\d+/i);
-
-        return match ? match[0] : '-';
-      }
-
-      function extractSeverity(text) {
-        const match = text.match(/\b(Critical|Major|Minor)\b/i);
-        return match ? match[1] : 'Unknown';
-      }
-
-      function extractService(text) {
-        if (/Service Degraded/i.test(text)) return 'Service Degraded';
-        if (/Service Unaffected/i.test(text)) return 'Service Unaffected';
-        if (/Service Interrupted/i.test(text)) return 'Service Interrupted';
-        return '-';
-      }
-
-      function extractJobType(text) {
-        if (/CRC/i.test(text)) return 'CRC ERROR';
-        if (/LINK DOWN/i.test(text)) return 'LINK DOWN';
-        if (/\bLOS\b/i.test(text)) return 'LOS';
-        if (/POWER|ไฟดับ/i.test(text)) return 'POWER ALARM';
-        if (/TEMP|TEMPERATURE/i.test(text)) return 'TEMPERATURE ALARM';
-        return 'UNKNOWN';
-      }
-
-      function detectOltModel(text) {
-        if (/MA5608T/i.test(text)) return 'MA5608T';
-        if (/MA5800/i.test(text)) return 'MA5800';
-        return 'UNKNOWN';
-      }
-
-      function buildTitleLinksSummary(titleLinks) {
-        if (!titleLinks || titleLinks.length === 0) {
-          return '';
-        }
-
-        let summary = `========================================
-    LINK SUMMARY
-    ========================================
-    
-    `;
-
-        titleLinks.forEach(function (link) {
-          summary += `[${link.index}] ${link.localDevice} ${
-            link.localInterface
-              ? link.localInterface.fullName
-              : link.localPortRaw || '-'
-          } <-> ${link.peerDevice} ${
-            link.peerInterface
-              ? link.peerInterface.fullName
-              : link.peerPortRaw || '-'
-          }
-    
-    `;
+      while ((match = regex.exec(clean)) !== null) {
+        links.push({
+          index: match[1],
+          localDevice: match[2],
+          localPortRaw: match[3],
+          localInterface: parseInterfaceToken(match[3], "GigabitEthernet"),
+          peerDevice: match[4],
+          peerPortRaw: match[5],
+          peerInterface: parseInterfaceToken(match[5], "GigabitEthernet"),
+          sourceType: "ME_MULTI_LINK_TITLE",
         });
-
-        return summary;
       }
 
-      function cleanDeviceName(deviceName) {
-        if (!deviceName || deviceName === '-') {
-          return '-';
-        }
+      return removeDuplicateLinks(links);
+    }
 
-        return deviceName.replace(/\([A-Z]+\)/gi, '');
+    function extractCrcTitleLinks(text) {
+      const links = [];
+      const clean = cleanText(text);
+
+      const crcType1Regex =
+        /-?(ME-\d+-\d+)(?:_V\d+)?\s+((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)\s+to\s+([A-Z0-9_-]+?)(?:_V\d+)?(?:_OFC-null|\s|\+|$)/gi;
+
+      let match;
+
+      while ((match = crcType1Regex.exec(clean)) !== null) {
+        links.push({
+          index: String(links.length + 1),
+          localDevice: normalizeDeviceFromTitle(match[1]),
+          localPortRaw: match[2],
+          localInterface: parseInterfaceToken(match[2], "GigabitEthernet"),
+          peerDevice: normalizeDeviceFromTitle(match[3]),
+          peerPortRaw: "-",
+          peerInterface: null,
+          sourceType: "METRONET_CRC_TO_OFC_NULL",
+        });
       }
 
-      function buildRemoteAccess(localDevice, peerDevice, mode) {
-        const cleanLocalDevice = cleanDeviceName(localDevice);
-        const cleanPeerDevice = cleanDeviceName(peerDevice);
+      const crcType2Regex =
+        /Link\s+CRC\s+Error\s+(ME-\d+-\d+)(?:_V\d+)?\s*\(((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\d+[\/_-]\d+[\/_-]\d+)\)\s+to\s+(ME-\d+-\d+)(?:_V\d+)?\s*\(((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\d+[\/_-]\d+[\/_-]\d+)\)/gi;
 
-        if (mode === 'OLT') {
-          return `========================================
-    REMOTE ACCESS
-    ========================================
-    
-    telnet [OLT-NAME]
-    enable
-    config
-    `;
+      while ((match = crcType2Regex.exec(clean)) !== null) {
+        links.push({
+          index: String(links.length + 1),
+          localDevice: normalizeDeviceFromTitle(match[1]),
+          localPortRaw: match[2],
+          localInterface: parseInterfaceToken(match[2], "GigabitEthernet"),
+          peerDevice: normalizeDeviceFromTitle(match[3]),
+          peerPortRaw: match[4],
+          peerInterface: parseInterfaceToken(match[4], "GigabitEthernet"),
+          sourceType: "LINK_CRC_ERROR_BRACKET",
+        });
+      }
+
+      return removeDuplicateLinks(links);
+    }
+
+    function extractAdvancedLinks(text) {
+      return [];
+    }
+
+    function getCliInterfaceName(interfaceObj) {
+      if (!interfaceObj) return "-";
+
+      if (interfaceObj.cliName) {
+        return interfaceObj.cliName;
+      }
+
+      const portOnly =
+        interfaceObj.portOnly ||
+        `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
+
+      if (interfaceObj.type === "GE") {
+        return `GigabitEthernet ${portOnly}`;
+      }
+
+      if (interfaceObj.type === "GigabitEthernet") {
+        return `GigabitEthernet ${portOnly}`;
+      }
+
+      return interfaceObj.cliName || interfaceObj.fullName;
+    }
+
+    function extractPeerPortFromLink(text) {
+      const peerMatch = text.match(/link\d*_(\d+)\/(\d+)\/(\d+)/i);
+
+      if (peerMatch) {
+        return `${peerMatch[1]}/${peerMatch[2]}/${peerMatch[3]}`;
+      }
+
+      return "-";
+    }
+
+    function extractTicket(text) {
+      const match =
+        text.match(/JB\d+-\d+/i) ||
+        text.match(/INC\d+/i) ||
+        text.match(/TT\d+/i) ||
+        text.match(/WO\d+/i);
+
+      return match ? match[0] : "-";
+    }
+
+    function extractSeverity(text) {
+      const match = text.match(/\b(Critical|Major|Minor)\b/i);
+      return match ? match[1] : "Unknown";
+    }
+
+    function extractService(text) {
+      if (/Service Degraded/i.test(text)) return "Service Degraded";
+      if (/Service Unaffected/i.test(text)) return "Service Unaffected";
+      if (/Service Interrupted/i.test(text)) return "Service Interrupted";
+      return "-";
+    }
+
+    function extractJobType(text) {
+      if (/CRC/i.test(text)) return "CRC ERROR";
+      if (/LINK DOWN/i.test(text)) return "LINK DOWN";
+      if (/\bLOS\b/i.test(text)) return "LOS";
+      if (/POWER|ไฟดับ/i.test(text)) return "POWER ALARM";
+      if (/TEMP|TEMPERATURE/i.test(text)) return "TEMPERATURE ALARM";
+      return "UNKNOWN";
+    }
+
+    function detectOltModel(text) {
+      if (/MA5608T/i.test(text)) return "MA5608T";
+      if (/MA5800/i.test(text)) return "MA5800";
+      return "UNKNOWN";
+    }
+
+    function buildTitleLinksSummary(titleLinks) {
+      if (!titleLinks || titleLinks.length === 0) {
+        return "";
+      }
+
+      let summary = `========================================
+LINK SUMMARY
+========================================
+
+`;
+
+      titleLinks.forEach(function (link) {
+        summary += `[${link.index}] ${link.localDevice} ${
+          link.localInterface ? link.localInterface.fullName : link.localPortRaw || "-"
+        } <-> ${link.peerDevice} ${
+          link.peerInterface ? link.peerInterface.fullName : link.peerPortRaw || "-"
         }
 
+`;
+      });
+
+      return summary;
+    }
+
+    function cleanDeviceName(deviceName) {
+      if (!deviceName || deviceName === "-") {
+        return "-";
+      }
+
+      return deviceName.replace(/\([A-Z]+\)/gi, "");
+    }
+
+    function buildRemoteAccess(localDevice, peerDevice, mode) {
+      const cleanLocalDevice = cleanDeviceName(localDevice);
+      const cleanPeerDevice = cleanDeviceName(peerDevice);
+
+      if (mode === "OLT") {
         return `========================================
-    REMOTE ACCESS
-    ========================================
-    
-    ssh [username]@${cleanLocalDevice}
-    ssh [username]@${cleanPeerDevice}
-    `;
+REMOTE ACCESS
+========================================
+
+telnet [OLT-NAME]
+enable
+config
+`;
       }
 
-      function buildInterfaceDiscovery(localInterface, peerPort) {
-        let localPortOnly = '-';
+      return `========================================
+REMOTE ACCESS
+========================================
 
-        if (localInterface && localInterface.frame) {
-          localPortOnly =
-            localInterface.portOnly ||
-            `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
-        }
+ssh [username]@${cleanLocalDevice}
+ssh [username]@${cleanPeerDevice}
+`;
+    }
 
-        let peerPortOnly = '-';
+    function buildInterfaceDiscovery(localInterface, peerPort) {
+      let localPortOnly = "-";
 
-        if (peerPort && peerPort !== '-') {
-          peerPortOnly = peerPort.replace(
-            /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
-            ''
-          );
-        }
+      if (localInterface && localInterface.frame) {
+        localPortOnly =
+          localInterface.portOnly ||
+          `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
+      }
 
+      let peerPortOnly = "-";
+
+      if (peerPort && peerPort !== "-") {
+        peerPortOnly = peerPort.replace(
+          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i,
+          ""
+        );
+      }
+
+      return `========================================
+INTERFACE DISCOVERY
+========================================
+
+display interface description | include ${localPortOnly}
+display interface description | include ${peerPortOnly}
+`;
+    }
+
+    function buildMeCommands(localInterface, jobType) {
+      let commands = "";
+
+      if (localInterface && localInterface.fullName) {
+        const ifName = getCliInterfaceName(localInterface);
+
+        commands += `display interface ${ifName}
+
+# Optional หากมีสิทธิ์
+# display current-configuration interface ${ifName}
+
+`;
+      }
+
+      commands += `display lldp neighbor brief
+display alarm active
+display logbuffer
+display interface description
+`;
+
+      return commands;
+    }
+
+    function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
+      let commands = "";
+
+      commands += `display board 0/[slot]
+display lldp neighbor brief
+display alarm active
+display logbuffer
+
+interface emu 1
+display power run info
+`;
+
+      return commands;
+    }
+
+    function buildWhatToCheck(localPort, jobType, mode) {
+      return `========================================
+WHAT TO CHECK
+========================================
+
+display interface ${localPort}
+- ดู UP/DOWN
+- ดู RX/TX Power
+- ดู CRC / Symbol / Error
+- ดู Last physical up/down time
+
+display interface description
+- ตรวจสอบ Description ตรงกับ Peer หรือไม่
+
+display alarm active
+display logbuffer
+`;
+    }
+
+    function buildJobMethod(localPort, jobType, mode) {
+      if (jobType === "CRC ERROR") {
         return `========================================
-    INTERFACE DISCOVERY
-    ========================================
-    
-    display interface description | include ${localPortOnly}
-    display interface description | include ${peerPortOnly}
-    `;
+CRC CHECK METHOD
+========================================
+
+1. display interface ${localPort}
+2. จดค่า CRC / Symbol
+3. รอ 3-5 นาที
+4. รันซ้ำและเปรียบเทียบ
+5. ถ้า CRC เพิ่มต่อเนื่อง ให้ตรวจ Fiber / Patch Cord / SFP
+`;
       }
 
-      function buildMeCommands(localInterface, jobType) {
-        let commands = '';
+      return `========================================
+GENERAL CHECK METHOD
+========================================
 
-        if (localInterface && localInterface.fullName) {
-          const ifName = getCliInterfaceName(localInterface);
+1. ตรวจ Interface
+2. ตรวจ Alarm
+3. ตรวจ Log
+4. ตรวจ Description
+`;
+    }
 
-          commands += `display interface ${ifName}
-    
-    # Optional หากมีสิทธิ์
-    # display current-configuration interface ${ifName}
-    
-    `;
+    function buildValueGuide() {
+      return `========================================
+VALUE GUIDE
+========================================
+
+CRC เพิ่มต่อเนื่อง = ผิดปกติ
+RX ต่ำ / No Signal = สงสัย Fiber หรือ SFP
+UP/UP แต่มี Error = ตรวจ CRC, Optical, Traffic
+DOWN/DOWN = ตรวจ Fiber, Remote, Config
+`;
+    }
+
+    function buildEscalation() {
+      return `========================================
+ESCALATION
+========================================
+
+Fiber Team:
+- CRC เพิ่มต่อเนื่อง
+- RX ต่ำ / No Signal
+- LOS / Optical Alarm
+
+NOC / Transport:
+- LLDP ไม่พบปลายทาง
+- Config ไม่ตรง
+- Alarm หลาย Node
+`;
+    }
+
+    function buildSafetyNote() {
+      return `========================================
+SAFETY NOTE
+========================================
+
+ก่อน Port Bounce:
+1. ตรวจ Description
+2. ตรวจ LLDP
+3. ยืนยันว่าไม่ใช่ Uplink หลัก / Ring / Core
+4. ขออนุญาตก่อนทำ
+`;
+    }
+
+    function buildPortBounce(localInterface, mode, oltModel) {
+      if (!localInterface || !localInterface.fullName) {
+        return "ไม่พบ Local Port จึงยังไม่แนะนำ shutdown / undo shutdown";
+      }
+
+      return `# Optional / ใช้เมื่อได้รับอนุญาต
+
+system-view
+interface ${getCliInterfaceName(localInterface)}
+shutdown
+undo shutdown`;
+    }
+
+    function buildRecommendation(jobType, mode) {
+      if (jobType === "CRC ERROR") {
+        return `Priority Check ME
+
+1. Interface Status
+2. RX/TX Power
+3. CRC / Symbol Counter
+4. Alarm
+5. Log
+
+Possible Cause:
+- Fiber Loss
+- Patch Cord
+- Connector
+- SFP
+- Link Flap
+`;
+      }
+
+      return `Priority Check
+
+1. Alarm
+2. Log
+3. Interface Description
+4. Interface Status
+`;
+    }
+
+    function analyzeJob(mode) {
+      const resultBox = document.getElementById("result");
+
+      try {
+        const text = cleanText(document.getElementById("jobInput").value);
+
+        if (!text.trim()) {
+          alert("กรุณาวาง Job Ticket");
+          return;
         }
 
-        commands += `display lldp neighbor brief
-    display alarm active
-    display logbuffer
-    display interface description
-    `;
+        const ticket = extractTicket(text);
+        const severity = extractSeverity(text);
+        const service = extractService(text);
+        const jobType = extractJobType(text);
+        const oltModel = detectOltModel(text);
 
-        return commands;
-      }
+        const titleLinksFromMe = extractTitleLinks(text);
+        const crcTitleLinks = extractCrcTitleLinks(text);
+        const advancedLinks = extractAdvancedLinks(text);
 
-      function buildWhatToCheck(localPort, jobType, mode) {
-        return `========================================
-    WHAT TO CHECK
-    ========================================
-    
-    display interface ${localPort}
-    - ดู UP/DOWN
-    - ดู RX/TX Power
-    - ดู CRC / Symbol / Error
-    - ดู Last physical up/down time
-    
-    display interface description
-    - ตรวจสอบ Description ตรงกับ Peer หรือไม่
-    
-    display alarm active
-    display logbuffer
-    `;
-      }
+        let titleLinks = [];
 
-      function buildJobMethod(localPort, jobType, mode) {
-        if (jobType === 'CRC ERROR') {
-          return `========================================
-    CRC CHECK METHOD
-    ========================================
-    
-    1. display interface ${localPort}
-    2. จดค่า CRC / Symbol
-    3. รอ 3-5 นาที
-    4. รันซ้ำและเปรียบเทียบ
-    5. ถ้า CRC เพิ่มต่อเนื่อง ให้ตรวจ Fiber / Patch Cord / SFP
-    `;
+        if (crcTitleLinks.length > 0) {
+          titleLinks = crcTitleLinks;
+        } else if (advancedLinks.length > 0) {
+          titleLinks = advancedLinks;
+        } else {
+          titleLinks = titleLinksFromMe;
         }
 
-        return `========================================
-    GENERAL CHECK METHOD
-    ========================================
-    
-    1. ตรวจ Interface
-    2. ตรวจ Alarm
-    3. ตรวจ Log
-    4. ตรวจ Description
-    `;
-      }
+        const firstTitleLink = titleLinks[0] || null;
+        const titleLinksSummary = buildTitleLinksSummary(titleLinks);
 
-      function buildValueGuide() {
-        return `========================================
-    VALUE GUIDE
-    ========================================
-    
-    CRC เพิ่มต่อเนื่อง = ผิดปกติ
-    RX ต่ำ / No Signal = สงสัย Fiber หรือ SFP
-    UP/UP แต่มี Error = ตรวจ CRC, Optical, Traffic
-    DOWN/DOWN = ตรวจ Fiber, Remote, Config
-    `;
-      }
+        const devices = extractDevices(text);
 
-      function buildEscalation() {
-        return `========================================
-    ESCALATION
-    ========================================
-    
-    Fiber Team:
-    - CRC เพิ่มต่อเนื่อง
-    - RX ต่ำ / No Signal
-    - LOS / Optical Alarm
-    
-    NOC / Transport:
-    - LLDP ไม่พบปลายทาง
-    - Config ไม่ตรง
-    - Alarm หลาย Node
-    `;
-      }
+        const localDevice = firstTitleLink
+          ? firstTitleLink.localDevice
+          : devices[0] || "-";
 
-      function buildSafetyNote() {
-        return `========================================
-    SAFETY NOTE
-    ========================================
-    
-    ก่อน Port Bounce:
-    1. ตรวจ Description
-    2. ตรวจ LLDP
-    3. ยืนยันว่าไม่ใช่ Uplink หลัก / Ring / Core
-    4. ขออนุญาตก่อนทำ
-    `;
-      }
+        const peerDevice = firstTitleLink
+          ? firstTitleLink.peerDevice
+          : devices[1] || "-";
 
-      function buildPortBounce(localInterface, mode, oltModel) {
-        if (!localInterface || !localInterface.fullName) {
-          return 'ไม่พบ Local Port จึงยังไม่แนะนำ shutdown / undo shutdown';
+        const discoveredInterfaces = extractInterfacesFromDescription(text);
+
+        let physicalInterfaces = [];
+
+        if (discoveredInterfaces.length > 0) {
+          physicalInterfaces = discoveredInterfaces;
+        } else if (firstTitleLink) {
+          physicalInterfaces = [
+            firstTitleLink.localInterface,
+            firstTitleLink.peerInterface,
+          ].filter(Boolean);
+        } else {
+          physicalInterfaces = extractInterfaces(text);
         }
 
-        return `# Optional / ใช้เมื่อได้รับอนุญาต
-    
-    system-view
-    interface ${getCliInterfaceName(localInterface)}
-    shutdown
-    undo shutdown`;
-      }
+        const localInterface = physicalInterfaces[0] || null;
+        const peerInterface = physicalInterfaces[1] || null;
 
-      function buildRecommendation(jobType, mode) {
-        if (jobType === 'CRC ERROR') {
-          return `Priority Check ME
-    
-    1. Interface Status
-    2. RX/TX Power
-    3. CRC / Symbol Counter
-    4. Alarm
-    5. Log
-    
-    Possible Cause:
-    - Fiber Loss
-    - Patch Cord
-    - Connector
-    - SFP
-    - Link Flap
-    `;
+        const localPort = localInterface ? localInterface.fullName : "-";
+
+        const cliLocalPort = localInterface
+          ? getCliInterfaceName(localInterface)
+          : "-";
+
+        let peerPort = peerInterface ? peerInterface.fullName : "-";
+
+        if (peerPort === "-") {
+          peerPort = extractPeerPortFromLink(text);
         }
 
-        return `Priority Check
-    
-    1. Alarm
-    2. Log
-    3. Interface Description
-    4. Interface Status
-    `;
+        const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
+        const interfaceDiscovery = buildInterfaceDiscovery(localInterface, peerPort);
+        const commands =
+          mode === "OLT"
+            ? buildOltCommands(localInterface, [], jobType, oltModel)
+            : buildMeCommands(localInterface, jobType);
+
+        const recommendation = buildRecommendation(jobType, mode);
+        const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
+        const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
+        const valueGuide = buildValueGuide();
+        const escalation = buildEscalation();
+        const portBounce = buildPortBounce(localInterface, mode, oltModel);
+        const safetyNote = buildSafetyNote();
+
+        const output = `========================================
+JOB ANALYSIS
+========================================
+
+ASSISTANT :
+Huawei ${mode === "OLT" ? "OLT" : "NOC_ME"} Assistant
+
+TICKET :
+${ticket}
+
+SERVICE :
+${service}
+
+SEVERITY :
+${severity}
+
+NETWORK TYPE :
+${mode}
+
+JOB TYPE :
+${jobType}
+
+LOCAL DEVICE :
+${localDevice}
+
+LOCAL PORT :
+${localPort}
+
+CLI LOCAL PORT :
+${cliLocalPort}
+
+PEER DEVICE :
+${peerDevice}
+
+PEER PORT :
+${peerPort}
+
+${titleLinksSummary}
+
+${remoteAccess}
+
+${interfaceDiscovery}
+
+========================================
+COMMANDS
+========================================
+
+${commands}
+
+${whatToCheck}
+
+${jobMethod}
+
+========================================
+AI RECOMMENDATION
+========================================
+
+${recommendation}
+
+${valueGuide}
+
+${escalation}
+
+========================================
+PORT BOUNCE / OPTIONAL
+========================================
+
+${portBounce}
+
+${safetyNote}
+`;
+
+        resultBox.value = cleanOutputText(output);
+      } catch (error) {
+        resultBox.value =
+          "เกิดข้อผิดพลาดใน JavaScript:\n\n" +
+          error.message +
+          "\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt;, &gt; หรือ * ปนอยู่ในโค้ด";
+        console.error(error);
       }
+    }
 
-      function analyzeJob(mode) {
-        const resultBox = document.getElementById('result');
+    function normalizeIfNameForReport(ifName) {
+      if (!ifName) return "-";
 
-        try {
-          const text = cleanText(document.getElementById('jobInput').value);
+      return String(ifName)
+        .replace(/GigabitEthernet\s*/i, "GigabitEthernet")
+        .replace(/^GE\s*/i, "GigabitEthernet")
+        .trim();
+    }
 
-          if (!text.trim()) {
-            alert('กรุณาวาง Job Ticket');
-            return;
-          }
+    function extractDeviceFromPrompt(text) {
+      const clean = cleanText(text);
 
-          const ticket = extractTicket(text);
-          const severity = extractSeverity(text);
-          const service = extractService(text);
-          const jobType = extractJobType(text);
-          const oltModel = detectOltModel(text);
+      const match =
+        clean.match(/\[~?([^\]]+)\]/) ||
+        clean.match(/<([^>]+)>/);
 
-          const titleLinksFromMe = extractTitleLinks(text);
-          const crcTitleLinks = extractCrcTitleLinks(text);
-          const advancedLinks = extractAdvancedLinks(text);
+      if (!match) return "-";
 
-          let titleLinks = [];
+      return match[1].replace(/_V\d+.*/i, "").trim();
+    }
 
-          if (crcTitleLinks.length > 0) {
-            titleLinks = crcTitleLinks;
-          } else if (advancedLinks.length > 0) {
-            titleLinks = advancedLinks;
-          } else {
-            titleLinks = titleLinksFromMe;
-          }
+    function extractInterfaceReportBlocks(text) {
+      const clean = cleanText(text);
+      const lines = clean.split(/\n/);
 
-          const firstTitleLink = titleLinks[0] || null;
-          const titleLinksSummary = buildTitleLinksSummary(titleLinks);
+      const blocks = [];
+      let currentBlock = null;
 
-          const devices = extractDevices(text);
+      lines.forEach(function (line) {
+        const trimmed = line.trim();
 
-          const localDevice = firstTitleLink
-            ? firstTitleLink.localDevice
-            : devices[0] || '-';
+        const promptMatch =
+          trimmed.match(/\[~?([^\]]+)\]\s*display interface\s+(.+)/i) ||
+          trimmed.match(/<([^>]+)>\s*display interface\s+(.+)/i);
 
-          const peerDevice = firstTitleLink
-            ? firstTitleLink.peerDevice
-            : devices[1] || '-';
-
-          const discoveredInterfaces = extractInterfacesFromDescription(text);
-
-          let physicalInterfaces = [];
-
-          if (discoveredInterfaces.length > 0) {
-            physicalInterfaces = discoveredInterfaces;
-          } else if (firstTitleLink) {
-            physicalInterfaces = [
-              firstTitleLink.localInterface,
-              firstTitleLink.peerInterface,
-            ].filter(Boolean);
-          } else {
-            physicalInterfaces = extractInterfaces(text);
-          }
-
-          const localInterface = physicalInterfaces[0] || null;
-          const peerInterface = physicalInterfaces[1] || null;
-
-          const localPort = localInterface ? localInterface.fullName : '-';
-
-          const cliLocalPort = localInterface
-            ? getCliInterfaceName(localInterface)
-            : '-';
-
-          let peerPort = peerInterface ? peerInterface.fullName : '-';
-
-          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
-          const interfaceDiscovery = buildInterfaceDiscovery(
-            localInterface,
-            peerPort
-          );
-          const commands = buildMeCommands(localInterface, jobType);
-          const recommendation = buildRecommendation(jobType, mode);
-          const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
-          const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
-          const valueGuide = buildValueGuide();
-          const escalation = buildEscalation();
-          const portBounce = buildPortBounce(localInterface, mode, oltModel);
-          const safetyNote = buildSafetyNote();
-
-          const output = `========================================
-    JOB ANALYSIS
-    ========================================
-    
-    ASSISTANT :
-    Huawei ${mode === 'OLT' ? 'OLT' : 'NOC_ME'} Assistant
-    
-    TICKET :
-    ${ticket}
-    
-    SERVICE :
-    ${service}
-    
-    SEVERITY :
-    ${severity}
-    
-    NETWORK TYPE :
-    ${mode}
-    
-    JOB TYPE :
-    ${jobType}
-    
-    LOCAL DEVICE :
-    ${localDevice}
-    
-    LOCAL PORT :
-    ${localPort}
-    
-    CLI LOCAL PORT :
-    ${cliLocalPort}
-    
-    PEER DEVICE :
-    ${peerDevice}
-    
-    PEER PORT :
-    ${peerPort}
-    
-    ${titleLinksSummary}
-    
-    ${remoteAccess}
-    
-    ${interfaceDiscovery}
-    
-    ========================================
-    COMMANDS
-    ========================================
-    
-    ${commands}
-    
-    ${whatToCheck}
-    
-    ${jobMethod}
-    
-    ========================================
-    AI RECOMMENDATION
-    ========================================
-    
-    ${recommendation}
-    
-    ${valueGuide}
-    
-    ${escalation}
-    
-    ========================================
-    PORT BOUNCE / OPTIONAL
-    ========================================
-    
-    ${portBounce}
-    
-    ${safetyNote}
-    `;
-
-          resultBox.value = cleanOutputText(output);
-        } catch (error) {
-          resultBox.value =
-            'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
-            error.message +
-            '\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt;, &gt; หรือ * ปนอยู่ในโค้ด';
-          console.error(error);
-        }
-      }
-
-      function normalizeIfNameForReport(ifName) {
-        if (!ifName) return '-';
-
-        return String(ifName)
-          .replace(/GigabitEthernet\s*/i, 'GigabitEthernet')
-          .replace(/^GE\s*/i, 'GigabitEthernet')
-          .trim();
-      }
-
-      function extractDeviceFromPrompt(text) {
-        const clean = cleanText(text);
-
-        const match = clean.match(/\[~?([^\]]+)\]/) || clean.match(/<([^>]+)>/);
-
-        if (!match) return '-';
-
-        return match[1].replace(/_V\d+.*/i, '').trim();
-      }
-
-      function extractInterfaceReportBlocks(text) {
-        const clean = cleanText(text);
-        const lines = clean.split(/\n/);
-
-        const blocks = [];
-        let currentBlock = null;
-
-        lines.forEach(function (line) {
-          const trimmed = line.trim();
-
-          const promptMatch =
-            trimmed.match(/\[~?([^\]]+)\]\s*display interface\s+(.+)/i) ||
-            trimmed.match(/<([^>]+)>\s*display interface\s+(.+)/i);
-
-          if (promptMatch) {
-            if (currentBlock) {
-              blocks.push(currentBlock);
-            }
-
-            currentBlock = {
-              device: promptMatch[1].replace(/_V\d+.*/i, ''),
-              commandInterface: normalizeIfNameForReport(promptMatch[2]),
-              rawLines: [trimmed],
-            };
-
-            return;
-          }
-
-          const interfaceStart = trimmed.match(
-            /^((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*\d+\/\d+\/\d+)\s+current state\s*:/i
-          );
-
-          if (interfaceStart) {
-            if (currentBlock) {
-              blocks.push(currentBlock);
-            }
-
-            currentBlock = {
-              device: extractDeviceFromPrompt(clean),
-              commandInterface: normalizeIfNameForReport(interfaceStart[1]),
-              rawLines: [trimmed],
-            };
-
-            return;
-          }
-
+        if (promptMatch) {
           if (currentBlock) {
-            currentBlock.rawLines.push(line);
+            blocks.push(currentBlock);
           }
-        });
+
+          currentBlock = {
+            device: promptMatch[1].replace(/_V\d+.*/i, ""),
+            commandInterface: normalizeIfNameForReport(promptMatch[2]),
+            rawLines: [trimmed],
+          };
+
+          return;
+        }
+
+        const interfaceStart = trimmed.match(
+          /^((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*\d+\/\d+\/\d+)\s+current state\s*:/i
+        );
+
+        if (interfaceStart) {
+          if (currentBlock) {
+            blocks.push(currentBlock);
+          }
+
+          currentBlock = {
+            device: extractDeviceFromPrompt(clean),
+            commandInterface: normalizeIfNameForReport(interfaceStart[1]),
+            rawLines: [trimmed],
+          };
+
+          return;
+        }
 
         if (currentBlock) {
-          blocks.push(currentBlock);
+          currentBlock.rawLines.push(line);
+        }
+      });
+
+      if (currentBlock) {
+        blocks.push(currentBlock);
+      }
+
+      const parsedBlocks = blocks.map(parseInterfaceReportBlock);
+
+      return removeDuplicateReportBlocks(parsedBlocks);
+    }
+
+    function parseInterfaceReportBlock(block) {
+      const text = block.rawLines.join("\n");
+
+      const interfaceMatch = text.match(
+        /((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*\d+\/\d+\/\d+)\s+current state\s*:\s*([A-Z]+)/i
+      );
+
+      const lineProtocolMatch = text.match(
+        /Line protocol current state\s*:\s*([A-Z]+)/i
+      );
+
+      const qualityMatch = text.match(
+        /Link quality grade\s*:\s*([A-Z]+)/i
+      );
+
+      const descriptionMatch = text.match(
+        /Description:\s*(.+)/i
+      );
+
+      const waveMatch = text.match(
+        /WaveLength:\s*([^,]+),\s*Transmission Distance:\s*(.+)/i
+      );
+
+      const rxMatch = text.match(
+        /Rx Power:\s*([-\d.]+\s*dBm),\s*Warning range:\s*(\[[^\]]+\]dBm)/i
+      );
+
+      const txMatch = text.match(
+        /Tx Power:\s*([-\d.]+\s*dBm),\s*Warning range:\s*(\[[^\]]+\]dBm)/i
+      );
+
+      const crcMatch = text.match(
+        /CRC:\s*(\d+)\s*packets,\s*Symbol:\s*(\d+)\s*packets/i
+      );
+
+      const ifName = interfaceMatch
+        ? normalizeIfNameForReport(interfaceMatch[1])
+        : block.commandInterface;
+
+      const state = interfaceMatch ? interfaceMatch[2] : "-";
+
+      const description = descriptionMatch
+        ? descriptionMatch[1].trim()
+        : "-";
+
+      let peerDevice = "-";
+      let peerPort = "-";
+
+      const descPeerMatch = description.match(
+        /^([A-Z0-9\-]+)(?:\([A-Z]+\))?_link\d*_(\d+)\/(\d+)\/(\d+)_/i
+      );
+
+      if (descPeerMatch) {
+        peerDevice = descPeerMatch[1];
+        peerPort = `${descPeerMatch[2]}/${descPeerMatch[3]}/${descPeerMatch[4]}`;
+      }
+
+      return {
+        device: block.device || "-",
+        interfaceName: ifName,
+        state: state,
+        lineProtocol: lineProtocolMatch ? lineProtocolMatch[1] : "-",
+        quality: qualityMatch ? qualityMatch[1] : "-",
+        description: description,
+        wavelength: waveMatch ? waveMatch[1].trim() : "-",
+        distance: waveMatch ? waveMatch[2].trim() : "-",
+        rxPower: rxMatch ? rxMatch[1].replace(/\s+/g, "") : "-",
+        rxWarning: rxMatch ? rxMatch[2].replace(/\s+/g, " ") : "-",
+        txPower: txMatch ? txMatch[1].replace(/\s+/g, "") : "-",
+        txWarning: txMatch ? txMatch[2].replace(/\s+/g, " ") : "-",
+        crc: crcMatch ? crcMatch[1] : "-",
+        symbol: crcMatch ? crcMatch[2] : "-",
+        peerDevice: peerDevice,
+        peerPort: peerPort,
+      };
+    }
+
+    function removeDuplicateReportBlocks(blocks) {
+      const map = new Map();
+
+      blocks.forEach(function (block) {
+        const key =
+          block.interfaceName +
+          "|" +
+          block.description +
+          "|" +
+          block.rxPower +
+          "|" +
+          block.txPower +
+          "|" +
+          block.crc +
+          "|" +
+          block.symbol;
+
+        if (!map.has(key)) {
+          map.set(key, block);
+        }
+      });
+
+      return Array.from(map.values());
+    }
+
+    function interfaceToTaskPort(ifName) {
+      if (!ifName || ifName === "-") return "-";
+
+      const match = ifName.match(/(\d+\/\d+\/\d+)/);
+      return match ? match[1] : "-";
+    }
+
+    function buildTaskDescriptionFromBlocks(blocks) {
+      if (!blocks || blocks.length === 0) {
+        return "Task Description\n3BB_Metronet CRC Error -";
+      }
+
+      const first = blocks[0];
+      const second = blocks[1];
+
+      const localDevice = first.device !== "-" ? first.device : "-";
+      const localPort = interfaceToTaskPort(first.interfaceName);
+
+      let peerDevice = "-";
+      let peerPort = "-";
+
+      if (second) {
+        peerDevice = second.device !== "-" ? second.device : first.peerDevice || "-";
+        peerPort = interfaceToTaskPort(second.interfaceName);
+      } else {
+        peerDevice = first.peerDevice || "-";
+        peerPort = first.peerPort || "-";
+      }
+
+      return `Task Description
+3BB_Metronet CRC Error ${localDevice}_${localPort} ${peerDevice}_${peerPort}`;
+    }
+
+    function buildSingleReportBlock(block) {
+      return `${block.interfaceName} current state : ${block.state}
+Line protocol current state : ${block.lineProtocol}
+Link quality grade : ${block.quality}
+Description: ${block.description}
+WaveLength: ${block.wavelength}, Transmission Distance: ${block.distance}
+Rx Power: ${block.rxPower}, Warning range: ${block.rxWarning}
+Tx Power: ${block.txPower}, Warning range: ${block.txWarning}
+CRC: ${block.crc} packets, Symbol: ${block.symbol} packets`;
+    }
+
+    function convertReportText() {
+      const input = document.getElementById("reportInput").value;
+      const result = document.getElementById("reportResult");
+
+      if (!input.trim()) {
+        alert("กรุณาวางข้อความ Raw ก่อน");
+        return;
+      }
+
+      const blocks = extractInterfaceReportBlocks(input);
+
+      if (blocks.length === 0) {
+        result.value =
+          "ไม่พบข้อมูล Interface\n\nกรุณาวางข้อความจาก display interface เช่น GigabitEthernet0/3/0 current state : UP";
+        return;
+      }
+
+      let output = buildTaskDescriptionFromBlocks(blocks);
+
+      output += "\n\n";
+
+      blocks.forEach(function (block, index) {
+        if (index > 0) {
+          output += "\n\n";
         }
 
-        const parsedBlocks = blocks.map(parseInterfaceReportBlock);
+        output += buildSingleReportBlock(block);
+      });
 
-        return removeDuplicateReportBlocks(parsedBlocks);
-      }
+      result.value = cleanOutputText(output);
+    }
 
-      function parseInterfaceReportBlock(block) {
-        const text = block.rawLines.join('\n');
-
-        const interfaceMatch = text.match(
-          /((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*\d+\/\d+\/\d+)\s+current state\s*:\s*([A-Z]+)/i
-        );
-
-        const lineProtocolMatch = text.match(
-          /Line protocol current state\s*:\s*([A-Z]+)/i
-        );
-
-        const qualityMatch = text.match(/Link quality grade\s*:\s*([A-Z]+)/i);
-
-        const descriptionMatch = text.match(/Description:\s*(.+)/i);
-
-        const waveMatch = text.match(
-          /WaveLength:\s*([^,]+),\s*Transmission Distance:\s*(.+)/i
-        );
-
-        const rxMatch = text.match(
-          /Rx Power:\s*([-\d.]+dBm),\s*Warning range:\s*(\[[^\]]+\]dBm)/i
-        );
-
-        const txMatch = text.match(
-          /Tx Power:\s*([-\d.]+dBm),\s*Warning range:\s*(\[[^\]]+\]dBm)/i
-        );
-
-        const crcMatch = text.match(
-          /CRC:\s*(\d+)\s*packets,\s*Symbol:\s*(\d+)\s*packets/i
-        );
-
-        const ifName = interfaceMatch
-          ? normalizeIfNameForReport(interfaceMatch[1])
-          : block.commandInterface;
-
-        const state = interfaceMatch ? interfaceMatch[2] : '-';
-
-        const description = descriptionMatch ? descriptionMatch[1].trim() : '-';
-
-        let peerDevice = '-';
-        let peerPort = '-';
-
-        const descPeerMatch = description.match(
-          /^([A-Z0-9\-]+)(?:\([A-Z]+\))?_link\d*_(\d+)\/(\d+)\/(\d+)_/i
-        );
-
-        if (descPeerMatch) {
-          peerDevice = descPeerMatch[1];
-          peerPort = `${descPeerMatch[2]}/${descPeerMatch[3]}/${descPeerMatch[4]}`;
-        }
-
-        return {
-          device: block.device || '-',
-          interfaceName: ifName,
-          state: state,
-          lineProtocol: lineProtocolMatch ? lineProtocolMatch[1] : '-',
-          quality: qualityMatch ? qualityMatch[1] : '-',
-          description: description,
-          wavelength: waveMatch ? waveMatch[1].trim() : '-',
-          distance: waveMatch ? waveMatch[2].trim() : '-',
-          rxPower: rxMatch ? rxMatch[1] : '-',
-          rxWarning: rxMatch ? rxMatch[2].replace(/\s+/g, ' ') : '-',
-          txPower: txMatch ? txMatch[1] : '-',
-          txWarning: txMatch ? txMatch[2].replace(/\s+/g, ' ') : '-',
-          crc: crcMatch ? crcMatch[1] : '-',
-          symbol: crcMatch ? crcMatch[2] : '-',
-          peerDevice: peerDevice,
-          peerPort: peerPort,
-        };
-      }
-
-      function removeDuplicateReportBlocks(blocks) {
-        const map = new Map();
-
-        blocks.forEach(function (block) {
-          const key =
-            block.interfaceName +
-            '|' +
-            block.description +
-            '|' +
-            block.rxPower +
-            '|' +
-            block.txPower +
-            '|' +
-            block.crc +
-            '|' +
-            block.symbol;
-
-          if (!map.has(key)) {
-            map.set(key, block);
-          }
-        });
-
-        return Array.from(map.values());
-      }
-
-      function interfaceToTaskPort(ifName) {
-        if (!ifName || ifName === '-') return '-';
-
-        const match = ifName.match(/(\d+\/\d+\/\d+)/);
-        return match ? match[1] : '-';
-      }
-
-      function buildTaskDescriptionFromBlocks(blocks) {
-        if (!blocks || blocks.length === 0) {
-          return 'Task Description\n3BB_Metronet CRC Error -';
-        }
-
-        const first = blocks[0];
-        const second = blocks[1];
-
-        const localDevice = first.device !== '-' ? first.device : '-';
-        const localPort = interfaceToTaskPort(first.interfaceName);
-
-        let peerDevice = '-';
-        let peerPort = '-';
-
-        if (second) {
-          peerDevice =
-            second.device !== '-' ? second.device : first.peerDevice || '-';
-          peerPort = interfaceToTaskPort(second.interfaceName);
-        } else {
-          peerDevice = first.peerDevice || '-';
-          peerPort = first.peerPort || '-';
-        }
-
-        return `Task Description
-    3BB_Metronet CRC Error ${localDevice}_${localPort} ${peerDevice}_${peerPort}`;
-      }
-
-      function buildSingleReportBlock(block) {
-        return `${block.interfaceName} current state : ${block.state}
-    Line protocol current state : ${block.lineProtocol}
-    Link quality grade : ${block.quality}
-    Description: ${block.description}
-    WaveLength: ${block.wavelength}, Transmission Distance: ${block.distance}
-    Rx Power: ${block.rxPower}, Warning range: ${block.rxWarning}
-    Tx Power: ${block.txPower}, Warning range: ${block.txWarning}
-    CRC: ${block.crc} packets, Symbol: ${block.symbol} packets`;
-      }
-
-      function convertReportText() {
-        const input = document.getElementById('reportInput').value;
-        const result = document.getElementById('reportResult');
-
-        if (!input.trim()) {
-          alert('กรุณาวางข้อความ Raw ก่อน');
-          return;
-        }
-
-        const blocks = extractInterfaceReportBlocks(input);
-
-        if (blocks.length === 0) {
-          result.value =
-            'ไม่พบข้อมูล Interface\n\nกรุณาวางข้อความจาก display interface เช่น GigabitEthernet0/3/0 current state : UP';
-          return;
-        }
-
-        let output = buildTaskDescriptionFromBlocks(blocks);
-
-        output += '\n\n';
-
-        blocks.forEach(function (block, index) {
-          if (index > 0) {
-            output += '\n\n';
-          }
-
-          output += buildSingleReportBlock(block);
-        });
-
-        result.value = cleanOutputText(output);
-      }
-
-      function clearAll() {
-        document.getElementById('jobInput').value = '';
-        document.getElementById('result').value = '';
-      }
-    </script>
-  </body>
+    function clearAll() {
+      document.getElementById("jobInput").value = "";
+      document.getElementById("result").value = "";
+    }
+  </script>
+</body>
 </html>
