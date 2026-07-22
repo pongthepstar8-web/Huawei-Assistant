@@ -1461,9 +1461,11 @@ ${safetyNote}
         const description = descriptionMatch ? descriptionMatch[1].trim() : '-';
         let peerDevice = '-';
         let peerPort = '-';
+
         const descPeerMatch = description.match(
-          /^([A-Z0-9\-]+)(?:\([A-Z]+\))?_link\d*_(\d+)\/(\d+)\/(\d+)_/i
+          /^([A-Z]+-\d+-\d+)(?:\([A-Z]+\))?_link\d*_(\d+)\/(\d+)\/(\d+)_/i
         );
+
         if (descPeerMatch) {
           peerDevice = descPeerMatch[1];
           peerPort = `${descPeerMatch[2]}/${descPeerMatch[3]}/${descPeerMatch[4]}`;
@@ -1522,18 +1524,25 @@ ${safetyNote}
         const first = blocks[0];
         const second = blocks[1];
 
-        const localDevice = safeReportDeviceName(first.device);
+        const localDevice =
+          first.device && first.device !== '-'
+            ? first.device
+            : 'LOCAL_DEVICE_UNKNOWN';
+
         const localPort = interfaceToTaskPort(first.interfaceName);
 
-        let peerDevice = 'UNKNOWN_DEVICE';
+        let peerDevice = 'PEER_DEVICE_UNKNOWN';
         let peerPort = '-';
 
-        if (second) {
-          peerDevice = safeReportDeviceName(second.device);
+        if (second && second.device && second.device !== '-') {
+          peerDevice = second.device;
           peerPort = interfaceToTaskPort(second.interfaceName);
-        } else {
-          peerDevice = safeReportDeviceName(first.peerDevice);
+        } else if (first.peerDevice && first.peerDevice !== '-') {
+          peerDevice = first.peerDevice;
           peerPort = first.peerPort || '-';
+        } else if (second) {
+          peerDevice = 'LOCAL_DEVICE_UNKNOWN';
+          peerPort = interfaceToTaskPort(second.interfaceName);
         }
 
         return `Task Description
