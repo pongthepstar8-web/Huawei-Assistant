@@ -779,11 +779,8 @@ CRC: 213356 packets, Symbol: 18515 packets"
         const clean = cleanText(text);
         let match;
 
-        // แบบ OX-OX:
-        // OX_3008_209_ZZ_01HW_0/2/2__-__OX_3015_089_ZZ_01HW_0/2/2
         const erpsOxRegex =
           /([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)__-__([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)/gi;
-
         while ((match = erpsOxRegex.exec(clean)) !== null) {
           links.push({
             index: String(links.length + 1),
@@ -795,62 +792,114 @@ CRC: 213356 packets, Symbol: 18515 packets"
           });
         }
 
-        // แบบ ME-OX:
-        // ME-3805-70_V529_0/2/2__-__OX_3805_171_ZZ_01HW_0/2/2
         const erpsMeOxRegex =
           /(ME-\d+-\d+(?:_V\d+)?)_(\d+\/\d+\/\d+)__-__([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)/gi;
-
         while ((match = erpsMeOxRegex.exec(clean)) !== null) {
           links.push({
             index: String(links.length + 1),
             localDevice: normalizeDeviceFromTitle(match[1]),
-            localInterface: makeInterfaceObject('GigabitEthernet', match[2]),
+            localInterface: makeInterfaceObject('PORT', match[2]),
             peerDevice: match[3],
             peerInterface: makeInterfaceObject('PORT', match[4]),
             sourceType: 'ERPS_ME_OX',
           });
         }
 
+        const meMeInterfaceRegex =
+          /(ME-\d+-\d+|MME-\d+-\d+)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)__-__(ME-\d+-\d+|MME-\d+-\d+)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)/gi;
+        while ((match = meMeInterfaceRegex.exec(clean)) !== null) {
+          links.push({
+            index: String(links.length + 1),
+            localDevice: normalizeDeviceFromTitle(match[1]),
+            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
+            peerDevice: normalizeDeviceFromTitle(match[3]),
+            peerInterface: parseInterfaceToken(match[4], 'GigabitEthernet'),
+            sourceType: 'ERPS_ME_ME_INTERFACE',
+          });
+        }
+
         return removeDuplicateLinks(links);
       }
+
       function isOltDeviceName(deviceName) {
         return /^(OX_|OLT)/i.test(deviceName || '');
       }
 
-      function selectInterfacesForMode(
-        mode,
-        firstTitleLink,
-        physicalInterfaces
-      ) {
-        if (mode === 'OLT' && firstTitleLink) {
-          // ถ้า Peer เป็น OLT/OX ให้ใช้ Peer Interface เป็น Local Interface ของ OLT
-          if (isOltDeviceName(firstTitleLink.peerDevice)) {
-            return {
-              localDevice: firstTitleLink.peerDevice,
-              peerDevice: firstTitleLink.localDevice,
-              localInterface: firstTitleLink.peerInterface,
-              peerInterface: firstTitleLink.localInterface,
-            };
-          }
+      function isMeDeviceName(deviceName) {
+        return /^(ME-|MME-)/i.test(deviceName || '');
+      }
 
-          // ถ้า Local เป็น OLT/OX
-          if (isOltDeviceName(firstTitleLink.localDevice)) {
+      function isRealMeInterface(interfaceObj) {
+        if (!interfaceObj) return false;
+        return ['GigabitEthernet', '10GE', '25GE', '40GE', '100GE'].includes(
+          interfaceObj.type
+        );
+      }
+
+      function selectContextForMode(mode, titleLinks, devices) {
+        const defaultLink =
+          titleLinks && titleLinks.length > 0 ? titleLinks[0] : null;
+
+        if (mode === 'OLT' && titleLinks && titleLinks.length > 0) {
+          const oltLink = titleLinks.find(function (link) {
+            return (
+              isOltDeviceName(link.localDevice) ||
+              isOltDeviceName(link.peerDevice)
+            );
+          });
+          if (oltLink) {
+            if (isOltDeviceName(oltLink.peerDevice)) {
+              return {
+                localDevice: oltLink.peerDevice,
+                peerDevice: oltLink.localDevice,
+                localInterface: oltLink.peerInterface,
+                peerInterface: oltLink.localInterface,
+              };
+            }
             return {
-              localDevice: firstTitleLink.localDevice,
-              peerDevice: firstTitleLink.peerDevice,
-              localInterface: firstTitleLink.localInterface,
-              peerInterface: firstTitleLink.peerInterface,
+              localDevice: oltLink.localDevice,
+              peerDevice: oltLink.peerDevice,
+              localInterface: oltLink.localInterface,
+              peerInterface: oltLink.peerInterface,
             };
           }
         }
 
+        if (mode === 'ME' && titleLinks && titleLinks.length > 0) {
+          const meLink = titleLinks.find(function (link) {
+            return (
+              isMeDeviceName(link.localDevice) &&
+              isMeDeviceName(link.peerDevice) &&
+              isRealMeInterface(link.localInterface)
+            );
+          });
+          if (meLink) {
+            return {
+              localDevice: meLink.localDevice,
+              peerDevice: meLink.peerDevice,
+              localInterface: meLink.localInterface,
+              peerInterface: meLink.peerInterface,
+            };
+          }
+        }
+
+        if (defaultLink) {
+          return {
+            localDevice: defaultLink.localDevice,
+            peerDevice: defaultLink.peerDevice,
+            localInterface: defaultLink.localInterface,
+            peerInterface: defaultLink.peerInterface,
+          };
+        }
+
         return {
-          localDevice: firstTitleLink ? firstTitleLink.localDevice : '-',
-          peerDevice: firstTitleLink ? firstTitleLink.peerDevice : '-',
-          localInterface: physicalInterfaces[0] || null,
-          peerInterface: physicalInterfaces[1] || null,
+          localDevice: devices[0] || '-',
+          peerDevice: devices[1] || '-',
+          localInterface: null,
+          peerInterface: null,
         };
       }
+
       function getCliInterfaceName(interfaceObj) {
         if (!interfaceObj) return '-';
         if (interfaceObj.cliName) return interfaceObj.cliName;
@@ -908,10 +957,7 @@ CRC: 213356 packets, Symbol: 18515 packets"
       function detectOltModel(text) {
         if (/MA5608T/i.test(text)) return 'MA5608T';
         if (/MA5800/i.test(text)) return 'MA5800';
-
-        // ถ้า Naming ภายในกำหนดว่า 01HW ใช้คำสั่ง mcu
         if (/OX_[A-Z0-9_]+_01HW/i.test(text)) return 'MA5608T';
-
         return 'UNKNOWN';
       }
 
@@ -1142,6 +1188,7 @@ interface mpu 0/${slot}
 display port ddm-info ${port}
 `;
       }
+
       function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
         let commands = `display board 0/[slot]
 display lldp neighbor brief
@@ -1396,6 +1443,7 @@ undo shutdown`;
             alert('กรุณาวาง Job Ticket');
             return;
           }
+
           const ticket = extractTicket(text);
           const severity = extractSeverity(text);
           const service = extractService(text);
@@ -1403,6 +1451,7 @@ undo shutdown`;
           const sitePriority = extractSitePriority(text);
           const oltModel = detectOltModel(text);
           const gponPorts = extractGponPorts(text);
+
           const titleLinksFromMe = extractTitleLinks(text);
           const crcTitleLinks = extractCrcTitleLinks(text);
           const advancedLinks = extractAdvancedLinks(text);
@@ -1412,63 +1461,45 @@ undo shutdown`;
           else if (advancedLinks.length > 0) titleLinks = advancedLinks;
           else titleLinks = titleLinksFromMe;
 
-          const firstTitleLink = titleLinks[0] || null;
           const titleLinksSummary = buildTitleLinksSummary(titleLinks);
           const devices = extractDevices(text);
-          const localDevice = firstTitleLink
-            ? firstTitleLink.localDevice
-            : devices[0] || '-';
-          const peerDevice = firstTitleLink
-            ? firstTitleLink.peerDevice
-            : devices[1] || '-';
-          const discoveredInterfaces = extractInterfacesFromDescription(text);
-
-          let physicalInterfaces = [];
-          if (discoveredInterfaces.length > 0)
-            physicalInterfaces = discoveredInterfaces;
-          else if (firstTitleLink)
-            physicalInterfaces = [
-              firstTitleLink.localInterface,
-              firstTitleLink.peerInterface,
-            ].filter(Boolean);
-          else physicalInterfaces = extractInterfaces(text);
-
-          const selected = selectInterfacesForMode(
+          const selectedContext = selectContextForMode(
             mode,
-            firstTitleLink,
-            physicalInterfaces
+            titleLinks,
+            devices
           );
+          const localDevice = selectedContext.localDevice;
+          const peerDevice = selectedContext.peerDevice;
 
-          const selectedLocalDevice =
-            selected.localDevice !== '-' ? selected.localDevice : localDevice;
+          const discoveredInterfaces = extractInterfacesFromDescription(text);
+          let localInterface = selectedContext.localInterface || null;
+          let peerInterface = selectedContext.peerInterface || null;
 
-          const selectedPeerDevice =
-            selected.peerDevice !== '-' ? selected.peerDevice : peerDevice;
+          if (discoveredInterfaces.length > 0 && mode !== 'OLT') {
+            localInterface = discoveredInterfaces[0] || localInterface;
+            peerInterface = discoveredInterfaces[1] || peerInterface;
+          }
 
-          const localInterface = selected.localInterface || null;
-          const peerInterface = selected.peerInterface || null;
+          if (!localInterface && titleLinks.length === 0) {
+            const extracted = extractInterfaces(text);
+            localInterface = extracted[0] || null;
+            peerInterface = extracted[1] || null;
+          }
 
           const localPort = localInterface ? localInterface.fullName : '-';
-
           const cliLocalPort = localInterface
             ? getCliInterfaceName(localInterface)
             : '-';
-
           let peerPort = peerInterface ? peerInterface.fullName : '-';
-          ``;
           if (peerPort === '-') peerPort = extractPeerPortFromLink(text);
-          const portWarning = buildPortWarning(cliLocalPort);
-          const remoteAccess = buildRemoteAccess(
-            selectedLocalDevice,
-            selectedPeerDevice,
-            mode
-          );
 
+          const portWarning = buildPortWarning(cliLocalPort);
+          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
           const interfaceDiscovery = buildInterfaceDiscovery(
             localInterface,
             peerPort,
-            selectedLocalDevice,
-            selectedPeerDevice
+            localDevice,
+            peerDevice
           );
           const commands =
             mode === 'OLT'
@@ -1516,8 +1547,11 @@ ${jobType}
 SITE PRIORITY :
 ${sitePriority}
 
+OLT MODEL :
+${mode === 'OLT' ? oltModel : '-'}
+
 LOCAL DEVICE :
-${selectedLocalDevice}
+${localDevice}
 
 LOCAL PORT :
 ${localPort}
@@ -1526,7 +1560,7 @@ CLI LOCAL PORT :
 ${cliLocalPort}
 
 PEER DEVICE :
-${selectedPeerDevice}
+${peerDevice}
 
 PEER PORT :
 ${peerPort}
