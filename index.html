@@ -709,6 +709,14 @@ CRC: 213356 packets, Symbol: 18515 packets"></textarea>
       return "-";
     }
 
+    function formatPortForDisplay(portText) {
+  if (!portText) return "-";
+
+  return String(portText)
+    .replace(/^PORT-/i, "")
+    .trim();
+}
+
     function extractTicket(text) {
       const match = text.match(/JB\d+-\d+/i) || text.match(/INC\d+/i) || text.match(/TT\d+/i) || text.match(/WO\d+/i);
       return match ? match[0] : "-";
@@ -756,7 +764,7 @@ LINK SUMMARY
 
 `;
       titleLinks.forEach(function (link) {
-        summary += `[${link.index}] ${link.localDevice} ${link.localInterface ? link.localInterface.fullName : link.localPortRaw || "-"} <-> ${link.peerDevice} ${link.peerInterface ? link.peerInterface.fullName : link.peerPortRaw || "-"}
+        summary += `[${link.index}] ${link.localDevice} ${link.localInterface ? link.localInterface.fullName : link.localPortRaw || "-"} ↔ ${link.peerDevice} ${link.peerInterface ? link.peerInterface.fullName : link.peerPortRaw || "-"}
 
 `;
       });
@@ -806,7 +814,9 @@ INTERFACE DISCOVERY
         }
       }
       if (peerPort && peerPort !== "-") {
-        const peerPortOnly = peerPort.replace(/^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i, "");
+        const peerPortOnly = peerPort
+  .replace(/^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i, "")
+  .replace(/^PORT-/i, "");
         if (peerPortOnly && peerPortOnly !== "-") {
           lines += `display interface description | include ${peerPortOnly}
 `;
@@ -1247,6 +1257,8 @@ shutdown
 undo shutdown`;
     }
 
+ 
+
     function analyzeJob(mode) {
       const resultBox = document.getElementById("result");
       try {
@@ -1345,7 +1357,7 @@ LOCAL DEVICE :
 ${localDevice}
 
 LOCAL PORT :
-${localPort}
+${formatPortForDisplay(localPort)}
 
 CLI LOCAL PORT :
 ${cliLocalPort}
@@ -1354,7 +1366,7 @@ PEER DEVICE :
 ${peerDevice}
 
 PEER PORT :
-${peerPort}
+${formatPortForDisplay(peerPort)}
 
 ${portWarning}
 
