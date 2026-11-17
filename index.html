@@ -1,1926 +1,280 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Huawei NOC / OLT Assistant</title>
-    <style>
-      :root {
-        --bg: #eef3f9;
-        --card: #ffffff;
-        --primary: #1565c0;
-        --primary-dark: #0d47a1;
-        --orange: #ef6c00;
-        --purple: #6a1b9a;
-        --red: #c62828;
-        --text: #1f2937;
-        --muted: #6b7280;
-        --border: #d8dee9;
-        --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
-        --radius: 18px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Huawei NOC / OLT Assistant</title>
+  <style>
+    :root {
+      --primary:#1565c0; --primary-dark:#0d47a1; --orange:#ef6c00;
+      --purple:#6a1b9a; --red:#c62828; --text:#1f2937;
+      --muted:#64748b; --border:#d8e0ea; --card:#fff;
+      --shadow:0 16px 40px rgba(15,23,42,.12); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:24px;font-family:"Segoe UI",Tahoma,sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(21,101,192,.15),transparent 30%),linear-gradient(135deg,#eef3f9,#f8fafc)}
+    .container{max-width:1380px;margin:auto}.card{background:rgba(255,255,255,.97);padding:26px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.75)}
+    .app-header,.panel-header{display:flex;align-items:center;justify-content:space-between;gap:16px}.app-header{padding:6px 4px 22px;border-bottom:1px solid var(--border);margin-bottom:22px}.brand{display:flex;align-items:center;gap:14px}.brand-icon{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#1976d2,#0d47a1);display:grid;place-items:center;color:#fff;font-size:26px;box-shadow:0 10px 24px rgba(21,101,192,.35)}
+    h1{margin:0;font-size:34px;color:var(--primary)}.brand p,.panel-subtitle{margin:5px 0 0;color:var(--muted);font-size:13px}.status-pill{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;border-radius:999px;padding:9px 13px;font-weight:700;font-size:13px}
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:18px}.panel-title{margin:0;font-size:20px;font-weight:800}.hint{color:var(--muted);font-size:12px;background:#f8fafc;border:1px solid var(--border);border-radius:999px;padding:7px 10px}
+    textarea{width:100%;border:1px solid #cfd8e3;border-radius:14px;padding:16px;font-size:14px;line-height:1.6;resize:vertical;font-family:Consolas,"Cascadia Mono",monospace;outline:none;background:#fff}textarea:focus{border-color:#1976d2;box-shadow:0 0 0 4px rgba(25,118,210,.12)}#jobInput{min-height:220px}#result{min-height:660px;background:#0f172a;color:#dbeafe;border-color:#1e293b;font-size:13px}
+    .command-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:10px;margin-top:14px}.option{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border);border-radius:12px;background:#f8fafc;cursor:pointer}.option:hover{border-color:#93c5fd;background:#eff6ff}.option input{margin-top:3px;accent-color:#1565c0}.option strong{display:block;font-size:13px}.option small{display:block;color:var(--muted);margin-top:3px;line-height:1.35}
+    .safety-option{border-color:#fecaca;background:#fff7f7}.mode-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}.mode-chip{display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--border);border-radius:999px;background:#fff;font-weight:700;font-size:13px}.mode-chip input{accent-color:#1565c0}
+    .buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}button{border:0;border-radius:14px;padding:14px 16px;color:#fff;font-weight:800;cursor:pointer;font-size:15px;min-height:52px;transition:.2s}button:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(15,23,42,.22)}.me{background:linear-gradient(135deg,#2196f3,#0d47a1)}.olt{background:linear-gradient(135deg,#ff9800,#e65100)}.select-all{background:linear-gradient(135deg,#8e24aa,#4a148c)}.clear{background:linear-gradient(135deg,#ef4444,#b91c1c)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.mini-btn{min-height:auto;padding:8px 12px;border:1px solid var(--border);background:#fff;color:#334155;border-radius:10px;font-size:13px;box-shadow:none}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:14px}
+    @media(max-width:1000px){.command-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){body{padding:10px}.card{padding:15px}.app-header,.panel-header{align-items:flex-start;flex-direction:column}.command-grid,.buttons{grid-template-columns:1fr}h1{font-size:27px}.hint{white-space:normal}}
+  </style>
+</head>
+<body>
+<div class="container"><div class="card">
+  <div class="app-header">
+    <div class="brand"><div class="brand-icon">🔧</div><div><h1>Huawei Assistant</h1><p>เลือกคำสั่ง ME / OLT ตามงานที่ต้องการ พร้อมขั้นตอนเข้าใช้งาน</p></div></div>
+    <div class="status-pill">● Tool Ready</div>
+  </div>
 
-      * {
-        box-sizing: border-box;
-      }
+  <div class="panel">
+    <div class="panel-header"><div><h2 class="panel-title">📥 Job Ticket</h2><div class="panel-subtitle">วาง Title แล้วเลือกหัวข้อคำสั่งที่ต้องการ</div></div><div class="hint">ระบบใส่ Login / enable / config ให้อัตโนมัติ</div></div>
+    <textarea id="jobInput" placeholder="ตัวอย่าง:
+ME_2517_032-3BB_Metronet CRC Error -ME-2517-32_V354 25GE0-2-19 to ME-2517-34(KKN)_link2_0/1/1_OFC-null
 
-      body {
-        font-family: 'Segoe UI', Tahoma, sans-serif;
-        background: radial-gradient(
-            circle at top left,
-            rgba(21, 101, 192, 0.15),
-            transparent 30%
-          ),
-          linear-gradient(135deg, #eef3f9, #f8fafc);
-        padding: 24px;
-        margin: 0;
-        color: var(--text);
-      }
+1612_005-[300]SitePriority=1(FBB-1)|3BB ERPS Loop Broken,-|ME-1612-91_V271_250/2/23__-__OX_1612_005_ZZ_01HW_0/3/2| +[NOTE]|ME-1612-91_25GE0/2/18__-__ME-1605-96_25GE0/2/14|"></textarea>
 
-      .container {
-        max-width: 1380px;
-        margin: auto;
-      }
-
-      .card {
-        background: rgba(255, 255, 255, 0.96);
-        padding: 26px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        border: 1px solid rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(10px);
-      }
-
-      .app-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        padding: 6px 4px 22px;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 22px;
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-      }
-
-      .brand-icon {
-        width: 54px;
-        height: 54px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #1976d2, #0d47a1);
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-size: 26px;
-        box-shadow: 0 10px 24px rgba(21, 101, 192, 0.35);
-      }
-
-      .brand-title h1 {
-        margin: 0;
-        font-size: 34px;
-        color: var(--primary);
-        line-height: 1.1;
-      }
-
-      .brand-title p {
-        margin: 6px 0 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #ecfdf5;
-        color: #047857;
-        border: 1px solid #a7f3d0;
-        border-radius: 999px;
-        padding: 9px 13px;
-        font-weight: 700;
-        font-size: 13px;
-        white-space: nowrap;
-      }
-
-      .panel {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 18px;
-        margin-bottom: 18px;
-      }
-
-      .panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-      }
-
-      .panel-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 20px;
-        font-weight: 800;
-        color: #111827;
-        margin: 0;
-      }
-
-      .panel-subtitle {
-        color: var(--muted);
-        font-size: 13px;
-        margin-top: 4px;
-      }
-
-      .hint {
-        color: var(--muted);
-        font-size: 12px;
-        background: #f8fafc;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        padding: 7px 10px;
-        white-space: nowrap;
-      }
-
-      textarea {
-        width: 100%;
-        border: 1px solid #cfd8e3;
-        border-radius: 14px;
-        padding: 16px;
-        box-sizing: border-box;
-        font-size: 14px;
-        line-height: 1.6;
-        resize: vertical;
-        font-family: Consolas, 'Cascadia Mono', 'Segoe UI', monospace;
-        color: #1f2937;
-        background: linear-gradient(180deg, #ffffff, #fbfdff);
-        outline: none;
-        transition: border 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      textarea:focus {
-        border-color: #1976d2;
-        box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12);
-      }
-
-      #jobInput {
-        min-height: 250px;
-      }
-
-      #result,
-      #reportResult {
-        min-height: 620px;
-        background: #0f172a;
-        color: #dbeafe;
-        border-color: #1e293b;
-        font-size: 13px;
-      }
-
-      #reportInput {
-        min-height: 360px;
-      }
-      #reportResult {
-        min-height: 520px;
-      }
-
-      .buttons {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin: 16px 0;
-      }
-
-      button {
-        position: relative;
-        overflow: hidden;
-        border: none;
-        border-radius: 14px;
-        padding: 14px 16px;
-        color: white;
-        font-weight: 800;
-        cursor: pointer;
-        font-size: 15px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-        min-height: 52px;
-      }
-
-      button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
-        filter: brightness(1.03);
-      }
-
-      button:active {
-        transform: translateY(0);
-        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
-      }
-      .me {
-        background: linear-gradient(135deg, #2196f3, #0d47a1);
-      }
-      .olt {
-        background: linear-gradient(135deg, #ff9800, #e65100);
-      }
-      .report {
-        background: linear-gradient(135deg, #8e24aa, #4a148c);
-      }
-      .clear {
-        background: linear-gradient(135deg, #ef4444, #b91c1c);
-      }
-
-      .toolbar {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-      }
-
-      .mini-btn {
-        border: 1px solid var(--border);
-        background: #ffffff;
-        color: #334155;
-        border-radius: 10px;
-        padding: 8px 12px;
-        font-size: 13px;
-        font-weight: 700;
-        min-height: auto;
-        box-shadow: none;
-      }
-
-      .mini-btn:hover {
-        transform: none;
-        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
-      }
-      .footer-note {
-        margin-top: 14px;
-        color: var(--muted);
-        font-size: 12px;
-        text-align: center;
-      }
-
-      @media (max-width: 900px) {
-        body {
-          padding: 12px;
-        }
-        .card {
-          padding: 18px;
-        }
-        .app-header {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .brand-title h1 {
-          font-size: 28px;
-        }
-        .buttons {
-          grid-template-columns: 1fr;
-        }
-        .hint {
-          white-space: normal;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="card">
-        <div class="app-header">
-          <div class="brand">
-            <div class="brand-icon">🔧</div>
-            <div class="brand-title">
-              <h1>Huawei Assistant</h1>
-              <p>NOC_ME / OLT / Report Converter Toolkit</p>
-            </div>
-          </div>
-          <div class="status-pill">● Tool Ready</div>
-        </div>
-
-        <div class="panel" id="mainInputPanel">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">📥 Job Ticket</h3>
-              <div class="panel-subtitle">
-                วาง Job Ticket, Title, หรือ Output จากอุปกรณ์เพื่อวิเคราะห์
-              </div>
-            </div>
-            <div class="hint">ME / OLT / CRC / Link Down / Report</div>
-          </div>
-
-          <textarea
-            id="jobInput"
-            placeholder="วาง Job Ticket ที่นี่ เช่น
-
-MME_3720_031-[800]SitePriority=2(Main_Node-2)|3BB_Metronet CRC Error MME-3720-31_0/3/2 ME-3703-33_0/3/0
-
-ME_3802_048-3BB Link Down-[1].ME-3802-48_0/2/0__-__MME-3513-31_GigabitEthernet0/5/2
-
-ME_3101_033-3BB_Metronet CRC Error -ME-3101-33_V547 GigabitEthernet0-3-21 to DLM-DX_3101_206_01HW_V589_OFC-null + CRC ERROR
-
-ME_3808_062-3BB_Metronet CRC Error -Link CRC Error ME-3808-62_V529 (GE0/2/0) to ME-3801-31 (GE0/2/1) + CRC ERROR
-
-หรือวางผล:
-GE0/2/0(10G)    up    up    MME-3513-31(BKN)_link2_0/5/2_OFC"
-          ></textarea>
-
-          <div class="buttons">
-            <button class="me" onclick="analyzeJob('ME')">
-              🔧 Huawei NOC_ME Assistant
-            </button>
-            <button class="olt" onclick="analyzeJob('OLT')">
-              🟠 Huawei OLT Assistant
-            </button>
-            <button class="report" onclick="showReportPage()">
-              📝 Report Converter
-            </button>
-            <button class="clear" onclick="clearAll()">🗑 Clear</button>
-          </div>
-        </div>
-
-        <div class="panel" id="mainResultPanel">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">📄 Result</h3>
-              <div class="panel-subtitle">ผลลัพธ์คำสั่งและแนวทางตรวจสอบ</div>
-            </div>
-            <div class="toolbar">
-              <button class="mini-btn" onclick="copyText('result')">
-                📋 Copy
-              </button>
-              <button class="mini-btn" onclick="clearResultOnly()">
-                🧹 Clear Result
-              </button>
-            </div>
-          </div>
-          <textarea id="result"></textarea>
-        </div>
-
-        <div id="reportPage" class="panel" style="display: none">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">📝 Report Converter</h3>
-              <div class="panel-subtitle">
-                แปลง Raw Output จาก display interface เป็นรายงานสั้น
-              </div>
-            </div>
-            <div class="toolbar">
-              <button class="mini-btn" onclick="copyText('reportResult')">
-                📋 Copy Report
-              </button>
-            </div>
-          </div>
-
-          <textarea
-            id="reportInput"
-            placeholder="วางข้อความ Raw จาก display interface ที่นี่ เช่น
-
-[~MME-3720-31]display interface GigabitEthernet0/3/2
-GigabitEthernet0/3/2 current state : UP (ifindex: 9)
-Line protocol current state : UP
-Link quality grade : GOOD
-Description: ME-3703-33(MDH)_link1_0/3/0_OFC
-WaveLength: 1490nm, Transmission Distance: 80km
-Rx Power: -21.61dBm, Warning range: [-23.098, -7.002]dBm
-Tx Power: 3.47dBm, Warning range: [0.000, 4.999]dBm
-CRC: 213356 packets, Symbol: 18515 packets"
-          ></textarea>
-
-          <div class="buttons">
-            <button class="report" onclick="convertReportText()">
-              🔄 แปลงรายงาน
-            </button>
-            <button class="clear" onclick="clearReport()">
-              🗑 Clear Report
-            </button>
-            <button class="me" onclick="showMainPage()">
-              🔙 กลับหน้า Assistant
-            </button>
-          </div>
-
-          <h3 class="panel-title">📄 Report Result</h3>
-          <textarea id="reportResult"></textarea>
-        </div>
-
-        <div class="footer-note">
-          Huawei Assistant Toolkit • NOC_ME / OLT / Report Converter
-        </div>
-      </div>
+    <div class="mode-row">
+      <span style="font-weight:800">โหมด:</span>
+      <label class="mode-chip"><input type="radio" name="mode" value="ME" checked> ME / MME</label>
+      <label class="mode-chip"><input type="radio" name="mode" value="OLT"> OLT</label>
+      <label class="mode-chip"><input type="checkbox" id="bothSides" checked> แสดงทั้ง Local และ Peer</label>
     </div>
 
-    <script>
-      function checkFactoryAuth() {
+    <div class="command-grid" id="commandOptions">
+      <label class="option"><input type="checkbox" value="interface" checked><span><strong>Interface Status</strong><small>UP/DOWN, traffic, last up/down</small></span></label>
+      <label class="option"><input type="checkbox" value="crc" checked><span><strong>CRC / Error</strong><small>CRC summary และเฉพาะ Port</small></span></label>
+      <label class="option"><input type="checkbox" value="optical" checked><span><strong>Optical Power</strong><small>RX/TX, DDM, ค่าแสง</small></span></label>
+      <label class="option"><input type="checkbox" value="battery"><span><strong>Power / Battery</strong><small>เปอร์เซ็นต์แบต, PSU, AC/DC Alarm</small></span></label>
+      <label class="option"><input type="checkbox" value="alarm" checked><span><strong>Alarm / Log</strong><small>Active alarm และ Log ย้อนหลัง</small></span></label>
+      <label class="option"><input type="checkbox" value="topology" checked><span><strong>LLDP / Description</strong><small>ค้นหา Peer และ Interface จริง</small></span></label>
+      <label class="option"><input type="checkbox" value="config"><span><strong>Port Configuration</strong><small>Current configuration ถ้ามีสิทธิ์</small></span></label>
+      <label class="option"><input type="checkbox" value="ont"><span><strong>GPON / ONT</strong><small>ONT optical และ battery state</small></span></label>
+      <label class="option safety-option"><input type="checkbox" value="reset"><span><strong>Reset Counter</strong><small>คำสั่งเปลี่ยนค่า ใช้เมื่อได้รับอนุญาต</small></span></label>
+      <label class="option safety-option"><input type="checkbox" value="bounce"><span><strong>Port Bounce</strong><small>shutdown / undo shutdown มีผลกระทบ</small></span></label>
+    </div>
+
+    <div class="buttons">
+      <button class="me" onclick="generateSelected()">⚙️ สร้างคำสั่งที่เลือก</button>
+      <button class="olt" onclick="presetForMode()">🧭 เลือกชุดแนะนำ</button>
+      <button class="select-all" onclick="toggleAllOptions()">☑ เลือก/ยกเลิกทั้งหมด</button>
+      <button class="clear" onclick="clearAll()">🗑 Clear</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><div><h2 class="panel-title">📄 Command Result</h2><div class="panel-subtitle">ลำดับเริ่มจาก Login เสมอ แล้วตามด้วยคำสั่งที่เลือก</div></div><div class="toolbar"><button class="mini-btn" onclick="copyResult()">📋 Copy</button><button class="mini-btn" onclick="document.getElementById('result').value=''">🧹 Clear Result</button></div></div>
+    <textarea id="result"></textarea>
+  </div>
+  <div class="footer">Huawei Assistant Toolkit • ไม่บันทึก Username หรือ Password จริงในไฟล์</div>
+</div></div>
+
+<script>
+function checkFactoryAuth() {
         const auth = JSON.parse(localStorage.getItem('factoryAuth'));
+
         if (!auth) {
           location.replace(
             'https://pongthepstar8-web.github.io/tool-launcher/'
           );
           return false;
         }
-        const expireTime = 8 * 60 * 60 * 1000;
+
+        const expireTime = 8 * 60 * 60 * 1000; // 8 ชั่วโมง
+
         if (Date.now() - auth.loginTime > expireTime) {
           localStorage.clear();
+
           location.replace(
             'https://pongthepstar8-web.github.io/tool-launcher/'
           );
           return false;
         }
+
         return true;
       }
 
       checkFactoryAuth();
 
-      function showReportPage() {
-        document.getElementById('mainInputPanel').style.display = 'none';
-        document.getElementById('mainResultPanel').style.display = 'none';
-        document.getElementById('reportPage').style.display = 'block';
-      }
-
-      function showMainPage() {
-        document.getElementById('mainInputPanel').style.display = 'block';
-        document.getElementById('mainResultPanel').style.display = 'block';
-        document.getElementById('reportPage').style.display = 'none';
-      }
-
-      function clearReport() {
-        document.getElementById('reportInput').value = '';
-        document.getElementById('reportResult').value = '';
-      }
-
-      function clearAll() {
-        document.getElementById('jobInput').value = '';
-        document.getElementById('result').value = '';
-      }
-
-      function clearResultOnly() {
-        document.getElementById('result').value = '';
-      }
-
-      function copyText(elementId) {
-        const box = document.getElementById(elementId);
-        if (!box || !box.value.trim()) {
-          alert('ยังไม่มีข้อความให้ Copy');
-          return;
-        }
-        navigator.clipboard
-          .writeText(box.value)
-          .then(function () {
-            alert('Copy เรียบร้อยแล้ว');
-          })
-          .catch(function () {
-            box.select();
-            document.execCommand('copy');
-            alert('Copy เรียบร้อยแล้ว');
-          });
-      }
-
-      function decodeHtmlEntities(text) {
-        const textarea = document.createElement('textarea');
-        textarea.innerHTML = text;
-        return textarea.value;
-      }
-
-      function cleanText(text) {
-        let output = String(text || '');
-        output = output
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/&lt;br\s*\/?&gt;/gi, '\n')
-          .replace(/&amp;lt;br\s*\/?&amp;gt;/gi, '\n');
-        output = decodeHtmlEntities(output);
-        output = output.replace(/<br\s*\/?>/gi, '\n');
-        output = output.replace(/<[^>]*>/g, '');
-        output = output.replace(/\r/g, '');
-        output = output.replace(/\n{3,}/g, '\n\n');
-        return output.trim();
-      }
-
-      function cleanOutputText(text) {
-        return cleanText(text);
-      }
-
-      function normalizeInterfaceType(type) {
-        const upper = String(type || '').toUpperCase();
-        if (upper === 'GE') return 'GigabitEthernet';
-        if (upper === 'GIGABITETHERNET') return 'GigabitEthernet';
-        if (upper === '10GE') return '10GE';
-        if (upper === '25GE') return '25GE';
-        if (upper === '40GE') return '40GE';
-        if (upper === '100GE') return '100GE';
-        if (upper === 'XGEI') return 'xgei';
-        if (upper === 'XXVGEI') return 'xxvgei';
-        return type;
-      }
-
-      function removeDuplicate(items) {
-        const map = new Map();
-        items.forEach(function (item) {
-          const key = item.fullName || JSON.stringify(item);
-          map.set(key, item);
-        });
-        return Array.from(map.values());
-      }
-
-      function removeDuplicateLinks(links) {
-        const map = new Map();
-        links.forEach(function (link) {
-          const localPort = link.localInterface
-            ? link.localInterface.fullName
-            : link.localPortRaw || '-';
-          const peerPort = link.peerInterface
-            ? link.peerInterface.fullName
-            : link.peerPortRaw || '-';
-          const key =
-            link.localDevice +
-            '|' +
-            localPort +
-            '|' +
-            link.peerDevice +
-            '|' +
-            peerPort;
-          map.set(key, link);
-        });
-        return Array.from(map.values()).map(function (link, index) {
-          link.index = String(index + 1);
-          return link;
-        });
-      }
-
-      function hasValidInterface(localInterface) {
-        return (
-          localInterface &&
-          localInterface.fullName &&
-          localInterface.fullName !== '-' &&
-          getCliInterfaceName(localInterface) !== '-'
-        );
-      }
-
-      function parseInterfaceToken(token, defaultType) {
-        if (!token) return null;
-        const cleanToken = String(token).trim().replace(/[()]/g, '');
-        const match = cleanToken.match(
-          /^(GigabitEthernet|GE|10GE|25GE|40GE|100GE|xgei|xxvgei)?\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)(?:\s*[\/_-]\s*(\d+))?$/i
-        );
-        if (!match) return null;
-        let type = match[1] || defaultType || 'GigabitEthernet';
-        if (/^GE$/i.test(type)) type = 'GigabitEthernet';
-        if (/^GigabitEthernet$/i.test(type)) type = 'GigabitEthernet';
-        if (/^xgei$/i.test(type)) type = 'xgei';
-        if (/^xxvgei$/i.test(type)) type = 'xxvgei';
-        const frame = match[2];
-        const slot = match[3];
-        const port = match[4];
-        const subPort = match[5] || '';
-        const portOnly = subPort
-          ? `${frame}/${slot}/${port}/${subPort}`
-          : `${frame}/${slot}/${port}`;
-        const separator = type === 'xgei' || type === 'xxvgei' ? '-' : ' ';
-        return {
-          type,
-          frame,
-          slot,
-          port,
-          subPort,
-          portOnly,
-          fullName: `${type}${separator}${portOnly}`,
-          cliName: `${type}${separator}${portOnly}`,
-        };
-      }
-
-      function makeInterfaceObject(type, portText) {
-        if (!portText) return null;
-        const cleanPort = String(portText)
-          .replace(/_/g, '/')
-          .replace(/-/g, '/')
-          .trim();
-        const parts = cleanPort.split('/');
-        const frame = parts[0] || '';
-        const slot = parts[1] || '';
-        const port = parts[2] || '';
-        const subPort = parts[3] || '';
-        const portOnly =
-          subPort !== ''
-            ? `${frame}/${slot}/${port}/${subPort}`
-            : `${frame}/${slot}/${port}`;
-        return {
-          type,
-          frame,
-          slot,
-          port,
-          subPort,
-          portOnly,
-          fullName: `${type}-${portOnly}`,
-          cliName: `${type}-${portOnly}`,
-          rawPort: cleanPort,
-        };
-      }
-
-      function extractInterfaces(text) {
-        const interfaces = [];
-        const interfaceRegex =
-          /(GigabitEthernet|100GE|40GE|25GE|10GE|GE)\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
-        let match;
-        while ((match = interfaceRegex.exec(text)) !== null) {
-          const type = normalizeInterfaceType(match[1]);
-          const frame = match[2];
-          const slot = match[3];
-          const port = match[4];
-          interfaces.push({
-            type,
-            frame,
-            slot,
-            port,
-            fullName: `${type} ${frame}/${slot}/${port}`,
-            cliName: `${type} ${frame}/${slot}/${port}`,
-          });
-        }
-        return removeDuplicate(interfaces);
-      }
-
-      function extractInterfacesFromDescription(text) {
-        const interfaces = [];
-        const lines = cleanText(text).split(/\r?\n/);
-        const lineRegex =
-          /^\s*(GE|GigabitEthernet|10GE|25GE|40GE|100GE)(\d+\/\d+\/\d+)(?:\(([^)]+)\))?\s+(up|down|\*down|\^down|\^up)/i;
-        lines.forEach(function (line) {
-          const match = line.match(lineRegex);
-          if (match) {
-            const rawType = match[1];
-            const portOnly = match[2];
-            const speed = match[3] || '';
-            const parts = portOnly.split('/');
-            let cliType = rawType;
-            if (rawType === 'GE') cliType = 'GigabitEthernet';
-            interfaces.push({
-              type: rawType,
-              cliType,
-              frame: parts[0],
-              slot: parts[1],
-              port: parts[2],
-              speed,
-              fullName: speed
-                ? `${rawType}${portOnly}(${speed})`
-                : `${rawType}${portOnly}`,
-              cliName: `${cliType} ${portOnly}`,
-            });
-          }
-        });
-        return removeDuplicate(interfaces);
-      }
-
-      function extractGponPorts(text) {
-        const ports = [];
-        const regex = /GPON\s*(\d+)\s*[\/_-]\s*(\d+)\s*[\/_-]\s*(\d+)/gi;
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-          ports.push({
-            frame: match[1],
-            slot: match[2],
-            port: match[3],
-            fullName: `GPON ${match[1]}/${match[2]}/${match[3]}`,
-          });
-        }
-        return removeDuplicate(ports);
-      }
-
-      function normalizeDeviceFromTitle(deviceName) {
-        if (!deviceName) return '-';
-        return String(deviceName)
-          .replace(/_V\d+.*/i, '')
-          .replace(/\s+/g, '')
-          .trim();
-      }
-
-      function extractDevices(text) {
-        const devices = [];
-        const deviceRegex =
-          /(MME-\d+-\d+|ME-\d+-\d+(?:\([A-Z]+\))?|DLM-DX_[A-Z0-9_]+|RAG_[A-Z0-9]+|RAC_[A-Z0-9]+|NMA_[A-Z0-9_]+|NE_[A-Z0-9_]+|OX_[A-Z0-9_]+|OLT[-_A-Z0-9]*)/gi;
-        let match;
-        while ((match = deviceRegex.exec(text)) !== null)
-          devices.push(match[1]);
-        return Array.from(new Set(devices));
-      }
-
-      function extractTitleLinks(text) {
-        const links = [];
-        const clean = cleanText(text);
-        const regex =
-          /\[(\d+)\]\.([A-Z]+-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)__-__([A-Z]+-\d+-\d+(?:\([A-Z]+\))?)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?[0-9]+[\/_-][0-9]+[\/_-][0-9]+)/gi;
-        let match;
-        while ((match = regex.exec(clean)) !== null) {
-          links.push({
-            index: match[1],
-            localDevice: match[2],
-            localPortRaw: match[3],
-            localInterface: parseInterfaceToken(match[3], 'GigabitEthernet'),
-            peerDevice: match[4],
-            peerPortRaw: match[5],
-            peerInterface: parseInterfaceToken(match[5], 'GigabitEthernet'),
-            sourceType: 'ME_MULTI_LINK_TITLE',
-          });
-        }
-        return removeDuplicateLinks(links);
-      }
-
-      function extractCrcTitleLinks(text) {
-        const links = [];
-        const clean = cleanText(text);
-        let match;
-
-        const crcType1Regex =
-          /-?(ME-\d+-\d+)(?:_V\d+)?\s+((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)\s+to\s+([A-Z0-9_-]+?)(?:_V\d+)?(?:_OFC-null|\s|\+|$)/gi;
-        while ((match = crcType1Regex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localPortRaw: match[2],
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerPortRaw: '-',
-            peerInterface: null,
-            sourceType: 'METRONET_CRC_TO_OFC_NULL',
-          });
-        }
-
-        const crcType2Regex =
-          /Link\s+CRC\s+Error\s+(ME-\d+-\d+)(?:_V\d+)?\s*\(((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\d+[\/_-]\d+[\/_-]\d+)\)\s+to\s+(ME-\d+-\d+)(?:_V\d+)?\s*\(((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\d+[\/_-]\d+[\/_-]\d+)\)/gi;
-        while ((match = crcType2Regex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localPortRaw: match[2],
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerPortRaw: match[4],
-            peerInterface: parseInterfaceToken(match[4], 'GigabitEthernet'),
-            sourceType: 'LINK_CRC_ERROR_BRACKET',
-          });
-        }
-
-        const crcType3Regex =
-          /3BB_Metronet\s+CRC\s+Error\s+(MME-\d+-\d+|ME-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)\s+(MME-\d+-\d+|ME-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)/gi;
-        while ((match = crcType3Regex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localPortRaw: match[2],
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerPortRaw: match[4],
-            peerInterface: parseInterfaceToken(match[4], 'GigabitEthernet'),
-            sourceType: 'METRONET_CRC_DEVICE_PORT_PAIR',
-          });
-        }
-
-        const crcType4Regex =
-          /3BB_Metronet\s+CRC\s+Error\s+-?(ME-\d+-\d+)(?:_V\d+)?\s+((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)\s+to\s+(ME-\d+-\d+)(?:\([A-Z]+\))?_link\d*_(\d+\/\d+\/\d+)_OFC-null/gi;
-        while ((match = crcType4Regex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localPortRaw: match[2],
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerPortRaw: match[4],
-            peerInterface: makeInterfaceObject('PORT', match[4]),
-            sourceType: 'METRONET_CRC_TO_PEER_LINK',
-          });
-        }
-
-        return removeDuplicateLinks(links);
-      }
-
-      function extractAdvancedLinks(text) {
-        const links = [];
-        const clean = cleanText(text);
-        let match;
-
-        const erpsOxRegex =
-          /([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)__-__([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)/gi;
-        while ((match = erpsOxRegex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: match[1],
-            localInterface: makeInterfaceObject('PORT', match[2]),
-            peerDevice: match[3],
-            peerInterface: makeInterfaceObject('PORT', match[4]),
-            sourceType: 'ERPS_OX',
-          });
-        }
-
-        const erpsMeOxRegex =
-          /(ME-\d+-\d+(?:_V\d+)?)_(\d+\/\d+\/\d+)__-__([A-Z]+_\d+_\d+_[A-Z0-9_]+)_(\d+\/\d+(?:\/\d+)?)/gi;
-        while ((match = erpsMeOxRegex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localInterface: makeInterfaceObject('PORT', match[2]),
-            peerDevice: match[3],
-            peerInterface: makeInterfaceObject('PORT', match[4]),
-            sourceType: 'ERPS_ME_OX',
-          });
-        }
-
-        const meMeInterfaceRegex =
-          /(ME-\d+-\d+|MME-\d+-\d+)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)__-__(ME-\d+-\d+|MME-\d+-\d+)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)/gi;
-        while ((match = meMeInterfaceRegex.exec(clean)) !== null) {
-          links.push({
-            index: String(links.length + 1),
-            localDevice: normalizeDeviceFromTitle(match[1]),
-            localInterface: parseInterfaceToken(match[2], 'GigabitEthernet'),
-            peerDevice: normalizeDeviceFromTitle(match[3]),
-            peerInterface: parseInterfaceToken(match[4], 'GigabitEthernet'),
-            sourceType: 'ERPS_ME_ME_INTERFACE',
-          });
-        }
-
-        return removeDuplicateLinks(links);
-      }
-
-      function isOltDeviceName(deviceName) {
-        return /^(OX_|OLT)/i.test(deviceName || '');
-      }
-
-      function isMeDeviceName(deviceName) {
-        return /^(ME-|MME-)/i.test(deviceName || '');
-      }
-
-      function isRealMeInterface(interfaceObj) {
-        if (!interfaceObj) return false;
-        return ['GigabitEthernet', '10GE', '25GE', '40GE', '100GE'].includes(
-          interfaceObj.type
-        );
-      }
-
-      function selectContextForMode(mode, titleLinks, devices) {
-        const defaultLink =
-          titleLinks && titleLinks.length > 0 ? titleLinks[0] : null;
-
-        if (mode === 'OLT' && titleLinks && titleLinks.length > 0) {
-          const oltLink = titleLinks.find(function (link) {
-            return (
-              isOltDeviceName(link.localDevice) ||
-              isOltDeviceName(link.peerDevice)
-            );
-          });
-          if (oltLink) {
-            if (isOltDeviceName(oltLink.peerDevice)) {
-              return {
-                localDevice: oltLink.peerDevice,
-                peerDevice: oltLink.localDevice,
-                localInterface: oltLink.peerInterface,
-                peerInterface: oltLink.localInterface,
-              };
-            }
-            return {
-              localDevice: oltLink.localDevice,
-              peerDevice: oltLink.peerDevice,
-              localInterface: oltLink.localInterface,
-              peerInterface: oltLink.peerInterface,
-            };
-          }
-        }
-
-        if (mode === 'ME' && titleLinks && titleLinks.length > 0) {
-          const meLink = titleLinks.find(function (link) {
-            return (
-              isMeDeviceName(link.localDevice) &&
-              isMeDeviceName(link.peerDevice) &&
-              isRealMeInterface(link.localInterface)
-            );
-          });
-          if (meLink) {
-            return {
-              localDevice: meLink.localDevice,
-              peerDevice: meLink.peerDevice,
-              localInterface: meLink.localInterface,
-              peerInterface: meLink.peerInterface,
-            };
-          }
-        }
-
-        if (defaultLink) {
-          return {
-            localDevice: defaultLink.localDevice,
-            peerDevice: defaultLink.peerDevice,
-            localInterface: defaultLink.localInterface,
-            peerInterface: defaultLink.peerInterface,
-          };
-        }
-
-        return {
-          localDevice: devices[0] || '-',
-          peerDevice: devices[1] || '-',
-          localInterface: null,
-          peerInterface: null,
-        };
-      }
-
-      function getCliInterfaceName(interfaceObj) {
-        if (!interfaceObj) return '-';
-        if (interfaceObj.cliName) return interfaceObj.cliName;
-        const portOnly =
-          interfaceObj.portOnly ||
-          `${interfaceObj.frame}/${interfaceObj.slot}/${interfaceObj.port}`;
-        if (interfaceObj.type === 'GE') return `GigabitEthernet ${portOnly}`;
-        if (interfaceObj.type === 'GigabitEthernet')
-          return `GigabitEthernet ${portOnly}`;
-        return interfaceObj.cliName || interfaceObj.fullName;
-      }
-
-      function extractPeerPortFromLink(text) {
-        const peerMatch = text.match(/link\d*_(\d+)\/(\d+)\/(\d+)/i);
-        if (peerMatch) return `${peerMatch[1]}/${peerMatch[2]}/${peerMatch[3]}`;
-        return '-';
-      }
-
-      function formatPortForDisplay(portText) {
-        if (!portText) return '-';
-
-        return String(portText)
-          .replace(/^PORT-/i, '')
-          .trim();
-      }
-
-      function extractTicket(text) {
-        const match =
-          text.match(/JB\d+-\d+/i) ||
-          text.match(/INC\d+/i) ||
-          text.match(/TT\d+/i) ||
-          text.match(/WO\d+/i);
-        return match ? match[0] : '-';
-      }
-
-      function extractSeverity(text) {
-        const match = text.match(/\b(Critical|Major|Minor)\b/i);
-        return match ? match[1] : 'Unknown';
-      }
-
-      function extractService(text) {
-        if (/Service Degraded/i.test(text)) return 'Service Degraded';
-        if (/Service Unaffected/i.test(text)) return 'Service Unaffected';
-        if (/Service Interrupted/i.test(text)) return 'Service Interrupted';
-        return '-';
-      }
-
-      function extractSitePriority(text) {
-        const match = text.match(/SitePriority\s*=\s*(\d+)/i);
-        return match ? match[1] : '-';
-      }
-
-      function extractJobType(text) {
-        if (/CRC/i.test(text)) return 'CRC ERROR';
-        if (/LINK DOWN/i.test(text)) return 'LINK DOWN';
-        if (/\bLOS\b/i.test(text)) return 'LOS';
-        if (/ERPS\s+Loop\s+Broken/i.test(text)) return 'ERPS LOOP BROKEN';
-        if (/POWER|ไฟดับ/i.test(text)) return 'POWER ALARM';
-        if (/TEMP|TEMPERATURE/i.test(text)) return 'TEMPERATURE ALARM';
-        return 'UNKNOWN';
-      }
-
-      function detectOltModel(text) {
-        if (/MA5608T/i.test(text)) return 'MA5608T';
-        if (/MA5800/i.test(text)) return 'MA5800';
-        if (/OX_[A-Z0-9_]+_01HW/i.test(text)) return 'MA5608T';
-        return 'UNKNOWN';
-      }
-
-      function buildTitleLinksSummary(titleLinks) {
-        if (!titleLinks || titleLinks.length === 0) return '';
-        let summary = `========================================
-LINK SUMMARY
-========================================
-
-`;
-        titleLinks.forEach(function (link) {
-          summary += `[${link.index}] ${link.localDevice} ${
-            link.localInterface
-              ? link.localInterface.fullName
-              : link.localPortRaw || '-'
-          } ↔ ${link.peerDevice} ${
-            link.peerInterface
-              ? link.peerInterface.fullName
-              : link.peerPortRaw || '-'
-          }
-
-`;
-        });
-        return summary;
-      }
-
-      function cleanDeviceName(deviceName) {
-        if (!deviceName || deviceName === '-') return '-';
-        return deviceName.replace(/\([A-Z]+\)/gi, '');
-      }
-
-      function buildRemoteAccess(localDevice, peerDevice, mode) {
-        const cleanLocalDevice = cleanDeviceName(localDevice);
-        const cleanPeerDevice = cleanDeviceName(peerDevice);
-        if (mode === 'OLT') {
-          const oltName =
-            cleanLocalDevice && cleanLocalDevice !== '-'
-              ? cleanLocalDevice.toLowerCase()
-              : '[OLT-NAME]';
-
-          return `========================================
-REMOTE ACCESS
-========================================
-
-# เข้า OLT
-telnet ${oltName}
-
-# Login
-User name : [username]
-User password : [password]
-
-# เข้า Privilege Mode
-enable
-
-# เข้า Configuration Mode
-config
-
-หมายเหตุ:
-- เปลี่ยน [username] และ [password] เป็นข้อมูลที่ได้รับสิทธิ์
-- ระบบไม่บันทึก Username หรือ Password ลงในรายงาน
-`;
-        }
-        return `========================================
-REMOTE ACCESS
-========================================
-
-ssh [username]@${cleanLocalDevice}
-ssh [username]@${cleanPeerDevice}
-`;
-      }
-
-      function buildInterfaceDiscovery(
-        localInterface,
-        peerPort,
-        localDevice,
-        peerDevice
-      ) {
-        let lines = `========================================
-INTERFACE DISCOVERY
-========================================
-
-`;
-        let hasDiscovery = false;
-        if (localInterface && localInterface.frame) {
-          const localPortOnly =
-            localInterface.portOnly ||
-            `${localInterface.frame}/${localInterface.slot}/${localInterface.port}`;
-          if (localPortOnly && localPortOnly !== '-') {
-            lines += `display interface description | include ${localPortOnly}
-`;
-            hasDiscovery = true;
-          }
-        }
-        if (peerPort && peerPort !== '-') {
-          const peerPortOnly = peerPort
-            .replace(/^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i, '')
-            .replace(/^PORT-/i, '');
-          if (peerPortOnly && peerPortOnly !== '-') {
-            lines += `display interface description | include ${peerPortOnly}
-`;
-            hasDiscovery = true;
-          }
-        }
-        if (!hasDiscovery) {
-          lines += `ไม่พบ Port สำหรับค้นหา Interface
-
-ให้ลองค้นหาจากชื่ออุปกรณ์:
-display interface description | include ${peerDevice || '-'}
-display interface description | include ${localDevice || '-'}
-
-`;
-        }
-        return lines;
-      }
-
-      function buildPortWarning(cliLocalPort) {
-        if (cliLocalPort !== '-') return '';
-        return `========================================
-WARNING
-========================================
-
-ระบบพบชื่ออุปกรณ์และประเภทงานแล้ว แต่ยังไม่พบ Interface / Port
-
-กรุณาเพิ่มข้อมูล เช่น:
-- GigabitEthernet0/3/2
-- GigabitEthernet0/3/0
-- หรือวางผล display interface / display interface description
-
-`;
-      }
-
-      function buildOltGponOpticalCommands(gponPorts) {
-        if (!gponPorts || gponPorts.length === 0) {
-          return `# GPON / ONT Optical
-# ถ้าทราบ Slot/PON ให้ใช้:
-interface gpon 0/[slot]
-display ont optical-info [slot] [pon] all
-display ont optical-info [pon] [ont]
-`;
-        }
-        let output = `# GPON / ONT Optical
-`;
-        gponPorts.forEach(function (gpon) {
-          output += `
-# ${gpon.fullName}
-interface gpon 0/${gpon.slot}
-display ont optical-info ${gpon.slot} ${gpon.port} all
-`;
-        });
-        return output;
-      }
-
-      function buildResetCounter(localInterface, mode, oltModel) {
-        if (!hasValidInterface(localInterface))
-          return 'ไม่พบ Local Port จึงยังไม่แนะนำ reset counter';
-        const ifName = getCliInterfaceName(localInterface);
-        if (mode === 'OLT') {
-          return `# Reset CRC / Statistics ฝั่ง OLT
-# ใช้เมื่อได้รับอนุญาตเท่านั้น
-reset port statistics ${localInterface.port || '[port]'}
-
-# หลัง reset ให้ observe อย่างน้อย 10 นาที`;
-        }
-        return `# Reset Counter / CRC ฝั่ง ME
-# ใช้เมื่อได้รับอนุญาตเท่านั้น
-reset counters interface ${ifName}
-
-# หลัง reset ให้ observe อย่างน้อย 10 นาที`;
-      }
-
-      function buildMeCommands(localInterface, jobType) {
-        let commands = '';
-        if (hasValidInterface(localInterface)) {
-          const ifName = getCliInterfaceName(localInterface);
-          const ifNameNoSpace = ifName.replace(/\s+/g, '');
-          commands += `display interface ${ifName}
-
-# CRC Summary ทั้งอุปกรณ์
-display interface brief
-
-# CRC เฉพาะ Port
-display interface brief | include ${ifNameNoSpace}
-
-# Optional หากมีสิทธิ์
-# display current-configuration interface ${ifName}
-
-# Reset Counter / CRC
-# ใช้เมื่อได้รับอนุญาตเท่านั้น
-# reset counters interface ${ifName}
-
-`;
-        } else {
-          commands += `# ไม่พบ Interface จาก Job Ticket
-# กรุณาระบุ Port หรือวางผล display interface เพิ่มเติม
-
-`;
-        }
-        commands += `display lldp neighbor brief
-display alarm active
-display logbuffer
-display interface description
-`;
-        return commands;
-      }
-
-      function buildOltDdmCommands(localInterface, oltModel) {
-        if (!localInterface || !localInterface.slot || !localInterface.port) {
-          return `# OLT DDM / Optical Power
-# ถ้าทราบ Slot/Port ให้ใช้:
-
-# MA5608T
-interface mcu 0/[slot]
-display port ddm-info [port]
-
-# MA5800
-interface mpu 0/[slot]
-display port ddm-info [port]
-`;
-        }
-
-        const slot = localInterface.slot;
-        const port = localInterface.port;
-
-        if (oltModel === 'MA5608T') {
-          return `# OLT DDM / Optical Power - MA5608T
-interface mcu 0/${slot}
-display port ddm-info ${port}
-`;
-        }
-
-        if (oltModel === 'MA5800') {
-          return `# OLT DDM / Optical Power - MA5800
-interface mpu 0/${slot}
-display port ddm-info ${port}
-`;
-        }
-
-        return `# OLT DDM / Optical Power
-# ถ้าเป็น MA5608T
-interface mcu 0/${slot}
-display port ddm-info ${port}
-
-# ถ้าเป็น MA5800
-interface mpu 0/${slot}
-display port ddm-info ${port}
-`;
-      }
-
-      function buildOltCommands(localInterface, gponPorts, jobType, oltModel) {
-        let commands = `display board 0/[slot]
-display lldp neighbor brief
-display alarm active
-display logbuffer
-
-# Power OLT
-interface emu 1
-display power run info
-# ใช้ตรวจ AC Fail / Power Module / Site Power
-
-`;
-
-        commands += buildOltDdmCommands(localInterface, oltModel);
-
-        commands += `
-# CRC / Port Statistics
-
-# MA5608T
-interface mcu 0/[slot]
-display port statistics [port]
-
-# MA5800
-interface mpu 0/[slot]
-display port statistics [port]
-
-`;
-
-        commands += buildOltGponOpticalCommands(gponPorts);
-
-        return commands;
-      }
-
-      function buildPeerSideCommands(peerDevice, peerInterface, peerPort) {
-        if (!peerDevice || peerDevice === '-') return '';
-
-        let output = `========================================
-PEER SIDE CHECK
-========================================
-
-ssh [username]@${cleanDeviceName(peerDevice)}
-`;
-
-        if (peerInterface && isRealMeInterface(peerInterface)) {
-          const peerIfName = getCliInterfaceName(peerInterface);
-          const peerIfNoSpace = peerIfName.replace(/\s+/g, '');
-          output += `display interface ${peerIfName}
-display interface brief | include ${peerIfNoSpace}
-
-# Optional หากมีสิทธิ์
-# display current-configuration interface ${peerIfName}
-`;
-          return output;
-        }
-
-        let peerPortOnly = '-';
-        if (peerInterface && peerInterface.portOnly) {
-          peerPortOnly = peerInterface.portOnly;
-        } else if (peerPort && peerPort !== '-') {
-          peerPortOnly = peerPort
-            .replace(/^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*/i, '')
-            .replace(/^PORT-/, '');
-        }
-
-        output += `# Peer Port ใน Title เป็น ${peerPortOnly}
-# ต้องค้นหา Interface จริงจาก Description ก่อน
-display interface description | include ${peerPortOnly}
-
-# เมื่อพบ Interface คอลัมน์แรก เช่น GE0/1/1 หรือ 25GE0/1/1 ให้ใช้:
-# display interface GigabitEthernet 0/1/1
-# หรือ
-# display interface 25GE 0/1/1
-
-display lldp neighbor brief
-display alarm active
-display logbuffer
-`;
-        return output;
-      }
-
-      function buildWhatToCheck(localPort, jobType, mode) {
-        const hasPort = localPort && localPort !== '-';
-        if (!hasPort) {
-          return `========================================
-WHAT TO CHECK
-========================================
-
-ไม่พบ Interface ที่ต้องตรวจสอบ
-
-ให้ตรวจสอบเพิ่ม:
-1. หา Port จาก Job Ticket
-2. รัน display interface description
-3. ค้นหา Description ด้วยชื่อ Peer Device
-4. วางผล display interface เพิ่มใน Report Converter
-
-คำสั่งพื้นฐาน:
-display interface description
-display lldp neighbor brief
-display alarm active
-display logbuffer
-`;
-        }
-        if (mode === 'OLT') {
-          return `========================================
-WHAT TO CHECK
-========================================
-
-display board 0/[slot]
-- ตรวจสอบ Board / Card ว่า Online หรือไม่
-
-display port ddm-info [port]
-- ดู RX Power / TX Power / SFP
-
-display port statistics [port]
-- ดู CRC / Error Counter
-
-interface emu 1
-display power run info
-- ตรวจ Power / AC Fail
-`;
-        }
-        return `========================================
-WHAT TO CHECK
-========================================
-
-display interface ${localPort}
-- ดู UP/DOWN
-- ดู RX/TX Power
-- ดู CRC / Symbol / Error
-- ดู Last physical up/down time
-
-display interface description
-- ตรวจสอบ Description ตรงกับ Peer หรือไม่
-
-display alarm active
-display logbuffer
-`;
-      }
-
-      function buildJobMethod(localPort, jobType, mode) {
-        const hasPort = localPort && localPort !== '-';
-        if (!hasPort) {
-          return `========================================
-CHECK METHOD
-========================================
-
-ยังไม่พบ Interface จึงยังไม่สามารถตรวจ CRC จาก Port ได้
-
-ขั้นตอนที่ควรทำ:
-1. หา Interface จาก Job Ticket หรือ Description
-2. รัน display interface description
-3. ยืนยัน Local Port จริง
-4. จากนั้นรัน display interface [PORT]
-5. จดค่า CRC / Symbol และเทียบหลัง 3-5 นาที
-`;
-        }
-        if (jobType === 'CRC ERROR') {
-          return `========================================
-CRC CHECK METHOD
-========================================
-
-1. display interface ${localPort}
-2. จดค่า CRC / Symbol
-3. รอ 3-5 นาที
-4. รันซ้ำและเปรียบเทียบ
-5. ถ้า CRC เพิ่มต่อเนื่อง ให้ตรวจ Fiber / Patch Cord / SFP
-`;
-        }
-        return `========================================
-GENERAL CHECK METHOD
-========================================
-
-1. ตรวจ Interface
-2. ตรวจ Alarm
-3. ตรวจ Log
-4. ตรวจ Description
-`;
-      }
-
-      function buildRecommendation(jobType, mode, cliLocalPort) {
-        if (cliLocalPort === '-') {
-          return `ระบบยังไม่สามารถสรุปค่า CRC ของ Port ได้ เพราะไม่พบ Interface
-
-คำแนะนำ:
-- หา Local Port ก่อน
-- ใช้ display interface description ค้นหาด้วยชื่อ Peer
-- ถ้ามี Raw Output จาก display interface ให้ใช้หน้า Report Converter
-`;
-        }
-        if (jobType === 'CRC ERROR') {
-          return `Priority Check ME
-
-1. Interface Status
-2. RX/TX Power
-3. CRC / Symbol Counter
-4. Alarm
-5. Log
-
-Possible Cause:
-- Fiber Loss
-- Patch Cord
-- Connector
-- SFP
-- Link Flap
-`;
-        }
-        return `Priority Check
-
-1. Alarm
-2. Log
-3. Interface Description
-4. Interface Status
-`;
-      }
-
-      function buildValueGuide() {
-        return `========================================
-VALUE GUIDE
-========================================
-
-CRC เพิ่มต่อเนื่อง = ผิดปกติ
-RX ต่ำ / No Signal = สงสัย Fiber หรือ SFP
-UP/UP แต่มี Error = ตรวจ CRC, Optical, Traffic
-DOWN/DOWN = ตรวจ Fiber, Remote, Config
-`;
-      }
-
-      function buildEscalation() {
-        return `========================================
-ESCALATION
-========================================
-
-Fiber Team:
-- CRC เพิ่มต่อเนื่อง
-- RX ต่ำ / No Signal
-- LOS / Optical Alarm
-
-NOC / Transport:
-- LLDP ไม่พบปลายทาง
-- Config ไม่ตรง
-- Alarm หลาย Node
-`;
-      }
-
-      function buildSafetyNote() {
-        return `========================================
-SAFETY NOTE
-========================================
-
-ก่อน Port Bounce / Reset Counter:
-1. ตรวจ Description
-2. ตรวจ LLDP
-3. ยืนยันว่าไม่ใช่ Uplink หลัก / Ring / Core
-4. ขออนุญาตก่อนทำ
-5. หลังทำให้ Observe อย่างน้อย 10 นาที
-`;
-      }
-
-      function buildPortBounce(localInterface, mode, oltModel) {
-        if (!hasValidInterface(localInterface))
-          return 'ไม่พบ Local Port จึงยังไม่แนะนำ shutdown / undo shutdown';
-        if (mode === 'OLT') {
-          if (oltModel === 'MA5608T') {
-            return `# ตรวจสอบ Topology ก่อนทุกครั้ง
-interface mcu 0/${localInterface.slot}
-shutdown ${localInterface.port}
-undo shutdown ${localInterface.port}`;
-          }
-          if (oltModel === 'MA5800') {
-            return `# ตรวจสอบ Topology ก่อนทุกครั้ง
-interface mpu 0/${localInterface.slot}
-shutdown ${localInterface.port}
-undo shutdown ${localInterface.port}`;
-          }
-          return `# ตรวจสอบ Topology ก่อนทุกครั้ง
-# MA5608T
-interface mcu 0/${localInterface.slot}
-shutdown ${localInterface.port}
-undo shutdown ${localInterface.port}
-
-# MA5800
-interface mpu 0/${localInterface.slot}
-shutdown ${localInterface.port}
-undo shutdown ${localInterface.port}`;
-        }
-        return `# Optional / ใช้เมื่อได้รับอนุญาต
-
-system-view
-interface ${getCliInterfaceName(localInterface)}
-shutdown
-undo shutdown`;
-      }
-
-      function analyzeJob(mode) {
-        const resultBox = document.getElementById('result');
-        try {
-          const text = cleanText(document.getElementById('jobInput').value);
-          if (!text.trim()) {
-            alert('กรุณาวาง Job Ticket');
-            return;
-          }
-
-          const ticket = extractTicket(text);
-          const severity = extractSeverity(text);
-          const service = extractService(text);
-          const jobType = extractJobType(text);
-          const sitePriority = extractSitePriority(text);
-          const oltModel = detectOltModel(text);
-          const gponPorts = extractGponPorts(text);
-
-          const titleLinksFromMe = extractTitleLinks(text);
-          const crcTitleLinks = extractCrcTitleLinks(text);
-          const advancedLinks = extractAdvancedLinks(text);
-
-          let titleLinks = [];
-          if (crcTitleLinks.length > 0) titleLinks = crcTitleLinks;
-          else if (advancedLinks.length > 0) titleLinks = advancedLinks;
-          else titleLinks = titleLinksFromMe;
-
-          const titleLinksSummary = buildTitleLinksSummary(titleLinks);
-          const devices = extractDevices(text);
-          const selectedContext = selectContextForMode(
-            mode,
-            titleLinks,
-            devices
-          );
-          const localDevice = selectedContext.localDevice;
-          const peerDevice = selectedContext.peerDevice;
-
-          const discoveredInterfaces = extractInterfacesFromDescription(text);
-          let localInterface = selectedContext.localInterface || null;
-          let peerInterface = selectedContext.peerInterface || null;
-
-          if (discoveredInterfaces.length > 0 && mode !== 'OLT') {
-            localInterface = discoveredInterfaces[0] || localInterface;
-            peerInterface = discoveredInterfaces[1] || peerInterface;
-          }
-
-          if (!localInterface && titleLinks.length === 0) {
-            const extracted = extractInterfaces(text);
-            localInterface = extracted[0] || null;
-            peerInterface = extracted[1] || null;
-          }
-
-          const localPort = localInterface ? localInterface.fullName : '-';
-          const cliLocalPort = localInterface
-            ? getCliInterfaceName(localInterface)
-            : '-';
-          let peerPort = peerInterface ? peerInterface.fullName : '-';
-          if (peerPort === '-') peerPort = extractPeerPortFromLink(text);
-
-          const portWarning = buildPortWarning(cliLocalPort);
-          const remoteAccess = buildRemoteAccess(localDevice, peerDevice, mode);
-          const interfaceDiscovery = buildInterfaceDiscovery(
-            localInterface,
-            peerPort,
-            localDevice,
-            peerDevice
-          );
-          const peerSideCommands = buildPeerSideCommands(
-            peerDevice,
-            peerInterface,
-            peerPort
-          );
-          const commands =
-            mode === 'OLT'
-              ? buildOltCommands(localInterface, gponPorts, jobType, oltModel)
-              : buildMeCommands(localInterface, jobType);
-          const resetCounter = buildResetCounter(
-            localInterface,
-            mode,
-            oltModel
-          );
-          const recommendation = buildRecommendation(
-            jobType,
-            mode,
-            cliLocalPort
-          );
-          const whatToCheck = buildWhatToCheck(cliLocalPort, jobType, mode);
-          const jobMethod = buildJobMethod(cliLocalPort, jobType, mode);
-          const valueGuide = buildValueGuide();
-          const escalation = buildEscalation();
-          const portBounce = buildPortBounce(localInterface, mode, oltModel);
-          const safetyNote = buildSafetyNote();
-
-          const output = `========================================
-JOB ANALYSIS
-========================================
-
-ASSISTANT :
-Huawei ${mode === 'OLT' ? 'OLT' : 'NOC_ME'} Assistant
-
-TICKET :
-${ticket}
-
-SERVICE :
-${service}
-
-SEVERITY :
-${severity}
-
-NETWORK TYPE :
-${mode}
-
-JOB TYPE :
-${jobType}
-
-SITE PRIORITY :
-${sitePriority}
-
-OLT MODEL :
-${mode === 'OLT' ? oltModel : '-'}
-
-LOCAL DEVICE :
-${localDevice}
-
-LOCAL PORT :
-${formatPortForDisplay(localPort)}
-
-CLI LOCAL PORT :
-${cliLocalPort}
-
-PEER DEVICE :
-${peerDevice}
-
-PEER PORT :
-${formatPortForDisplay(peerPort)}
-
-${portWarning}
-
-${titleLinksSummary}
-
-${remoteAccess}
-
-${interfaceDiscovery}
-
-========================================
-COMMANDS
-========================================
-
-${commands}
-
-${peerSideCommands}
-
-${whatToCheck}
-
-${jobMethod}
-
-========================================
-AI RECOMMENDATION
-========================================
-
-${recommendation}
-
-${valueGuide}
-
-${escalation}
-
-========================================
-RESET COUNTER / CRC
-========================================
-
-${resetCounter}
-
-========================================
-PORT BOUNCE / OPTIONAL
-========================================
-
-${portBounce}
-
-${safetyNote}
-`;
-          resultBox.value = cleanOutputText(output);
-        } catch (error) {
-          resultBox.value =
-            'เกิดข้อผิดพลาดใน JavaScript:\n\n' +
-            error.message +
-            '\n\nกรุณาตรวจสอบว่าไม่มี <br>, &lt;br&gt;, &gt; หรือ * ปนอยู่ในโค้ด';
-          console.error(error);
-        }
-      }
-
-      function normalizeIfNameForReport(ifName) {
-        if (!ifName) return '-';
-        return String(ifName)
-          .replace(/GigabitEthernet\s*/i, 'GigabitEthernet')
-          .replace(/^GE\s*/i, 'GigabitEthernet')
-          .trim();
-      }
-
-      function extractDeviceFromPrompt(text) {
-        const raw = String(text || '');
-        const match =
-          raw.match(/^\s*\[~?([^\]]+)\]\s*display interface/im) ||
-          raw.match(/^\s*<([^>]+)>\s*display interface/im);
-        if (!match) return '-';
-        return match[1].replace(/_V\d+.*/i, '').trim();
-      }
-
-      function isValidDeviceNameForReport(name) {
-        if (!name || name === '-') return false;
-        if (/^-?\d+(\.\d+)?\s*,/i.test(name)) return false;
-        if (/dBm|Warning|range|Rx|Tx/i.test(name)) return false;
-        return /^(ME-|MME-|NE_|OX_|RAG_|RAC_|NMA_|DLM-DX_)/i.test(name);
-      }
-
-      function safeReportDeviceName(name) {
-        return isValidDeviceNameForReport(name) ? name : 'UNKNOWN_DEVICE';
-      }
-
-      function extractInterfaceReportBlocks(text) {
-        const clean = cleanText(text);
-        const lines = clean.split(/\n/);
-        const blocks = [];
-        let currentBlock = null;
-        lines.forEach(function (line) {
-          const trimmed = line.trim();
-          const promptMatch =
-            trimmed.match(/\[~?([^\]]+)\]\s*display interface\s+(.+)/i) ||
-            trimmed.match(/<([^>]+)>\s*display interface\s+(.+)/i);
-          if (promptMatch) {
-            if (currentBlock) blocks.push(currentBlock);
-            currentBlock = {
-              device: promptMatch[1].replace(/_V\d+.*/i, ''),
-              commandInterface: normalizeIfNameForReport(promptMatch[2]),
-              rawLines: [trimmed],
-            };
-            return;
-          }
-          const interfaceStart = trimmed.match(
-            /^((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*\d+\/\d+\/\d+)\s+current state\s*:/i
-          );
-          if (interfaceStart) {
-            if (currentBlock) blocks.push(currentBlock);
-            currentBlock = {
-              device: '-',
-              commandInterface: normalizeIfNameForReport(interfaceStart[1]),
-              rawLines: [trimmed],
-            };
-            return;
-          }
-          if (currentBlock) currentBlock.rawLines.push(line);
-        });
-        if (currentBlock) blocks.push(currentBlock);
-        const parsedBlocks = blocks.map(parseInterfaceReportBlock);
-        return removeDuplicateReportBlocks(parsedBlocks);
-      }
-
-      function parseInterfaceReportBlock(block) {
-        const text = block.rawLines.join('\n');
-        const interfaceMatch = text.match(
-          /((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\s*\d+\/\d+\/\d+)\s+current state\s*:\s*([A-Z]+)/i
-        );
-        const lineProtocolMatch = text.match(
-          /Line protocol current state\s*:\s*([A-Z]+)/i
-        );
-        const qualityMatch = text.match(/Link quality grade\s*:\s*([A-Z]+)/i);
-        const descriptionMatch = text.match(/Description:\s*(.+)/i);
-        const waveMatch = text.match(
-          /WaveLength:\s*([^,]+),\s*Transmission Distance:\s*(.+)/i
-        );
-        const rxMatch = text.match(
-          /Rx Power:\s*([-\d.]+\s*dBm),\s*Warning range:\s*(\[[^\]]+\]dBm)/i
-        );
-        const txMatch = text.match(
-          /Tx Power:\s*([-\d.]+\s*dBm),\s*Warning range:\s*(\[[^\]]+\]dBm)/i
-        );
-        const crcMatch = text.match(
-          /CRC:\s*(\d+)\s*packets,\s*Symbol:\s*(\d+)\s*packets/i
-        );
-        const ifName = interfaceMatch
-          ? normalizeIfNameForReport(interfaceMatch[1])
-          : block.commandInterface;
-        const state = interfaceMatch ? interfaceMatch[2] : '-';
-        const description = descriptionMatch ? descriptionMatch[1].trim() : '-';
-        let peerDevice = '-';
-        let peerPort = '-';
-        const descPeerMatch = description.match(
-          /^([A-Z]+-\d+-\d+)(?:\([A-Z]+\))?_link\d*_(\d+)\/(\d+)\/(\d+)_/i
-        );
-        if (descPeerMatch) {
-          peerDevice = descPeerMatch[1];
-          peerPort = `${descPeerMatch[2]}/${descPeerMatch[3]}/${descPeerMatch[4]}`;
-        }
-        return {
-          device: block.device || '-',
-          interfaceName: ifName,
-          state,
-          lineProtocol: lineProtocolMatch ? lineProtocolMatch[1] : '-',
-          quality: qualityMatch ? qualityMatch[1] : '-',
-          description,
-          wavelength: waveMatch ? waveMatch[1].trim() : '-',
-          distance: waveMatch ? waveMatch[2].trim() : '-',
-          rxPower: rxMatch ? rxMatch[1].replace(/\s+/g, '') : '-',
-          rxWarning: rxMatch ? rxMatch[2].replace(/\s+/g, ' ') : '-',
-          txPower: txMatch ? txMatch[1].replace(/\s+/g, '') : '-',
-          txWarning: txMatch ? txMatch[2].replace(/\s+/g, ' ') : '-',
-          crc: crcMatch ? crcMatch[1] : '-',
-          symbol: crcMatch ? crcMatch[2] : '-',
-          peerDevice,
-          peerPort,
-        };
-      }
-
-      function removeDuplicateReportBlocks(blocks) {
-        const map = new Map();
-        blocks.forEach(function (block) {
-          const key =
-            block.interfaceName +
-            '|' +
-            block.description +
-            '|' +
-            block.rxPower +
-            '|' +
-            block.txPower +
-            '|' +
-            block.crc +
-            '|' +
-            block.symbol;
-          if (!map.has(key)) map.set(key, block);
-        });
-        return Array.from(map.values());
-      }
-
-      function interfaceToTaskPort(ifName) {
-        if (!ifName || ifName === '-') return '-';
-        const match = ifName.match(/(\d+\/\d+\/\d+)/);
-        return match ? match[1] : '-';
-      }
-
-      function buildTaskDescriptionFromBlocks(blocks) {
-        if (!blocks || blocks.length === 0)
-          return 'Task Description\n3BB_Metronet CRC Error -';
-        const first = blocks[0];
-        const second = blocks[1];
-        const localDevice =
-          first.device && first.device !== '-'
-            ? first.device
-            : 'LOCAL_DEVICE_UNKNOWN';
-        const localPort = interfaceToTaskPort(first.interfaceName);
-        let peerDevice = 'PEER_DEVICE_UNKNOWN';
-        let peerPort = '-';
-        if (second && second.device && second.device !== '-') {
-          peerDevice = second.device;
-          peerPort = interfaceToTaskPort(second.interfaceName);
-        } else if (first.peerDevice && first.peerDevice !== '-') {
-          peerDevice = first.peerDevice;
-          peerPort = first.peerPort || '-';
-        } else if (second) {
-          peerDevice = 'LOCAL_DEVICE_UNKNOWN';
-          peerPort = interfaceToTaskPort(second.interfaceName);
-        }
-        return `Task Description
-3BB_Metronet CRC Error ${localDevice}_${localPort} ${peerDevice}_${peerPort}`;
-      }
-
-      function buildSingleReportBlock(block) {
-        return `${block.interfaceName} current state : ${block.state}
-Line protocol current state : ${block.lineProtocol}
-Link quality grade : ${block.quality}
-Description: ${block.description}
-WaveLength: ${block.wavelength}, Transmission Distance: ${block.distance}
-Rx Power: ${block.rxPower}, Warning range: ${block.rxWarning}
-Tx Power: ${block.txPower}, Warning range: ${block.txWarning}
-CRC: ${block.crc} packets, Symbol: ${block.symbol} packets`;
-      }
-
-      function convertReportText() {
-        const input = document.getElementById('reportInput').value;
-        const result = document.getElementById('reportResult');
-        if (!input.trim()) {
-          alert('กรุณาวางข้อความ Raw ก่อน');
-          return;
-        }
-        const blocks = extractInterfaceReportBlocks(input);
-        if (blocks.length === 0) {
-          result.value =
-            'ไม่พบข้อมูล Interface\n\nกรุณาวางข้อความจาก display interface เช่น GigabitEthernet0/3/0 current state : UP';
-          return;
-        }
-        let output = buildTaskDescriptionFromBlocks(blocks);
-        output += '\n\n';
-        blocks.forEach(function (block, index) {
-          if (index > 0) output += '\n\n';
-          output += buildSingleReportBlock(block);
-        });
-        result.value = cleanOutputText(output);
-      }
-    </script>
-  </body>
+  function checkFactoryAuth() {
+    const auth = JSON.parse(localStorage.getItem("factoryAuth"));
+    if (!auth) {
+      location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
+      return false;
+    }
+    const expireTime = 8 * 60 * 60 * 1000;
+    if (Date.now() - auth.loginTime > expireTime) {
+      localStorage.clear();
+      location.replace("https://pongthepstar8-web.github.io/tool-launcher/");
+      return false;
+    }
+    return true;
+  }
+  checkFactoryAuth();
+
+  function decodeHtmlEntities(text) {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = text;
+    return textarea.value;
+  }
+
+  function cleanText(text) {
+    let output = String(text || "");
+    output = output
+      .replace(/<br\s*[^>]*>/gi, "\n")
+      .replace(/&lt;br\s*[^&]*&gt;/gi, "\n")
+      .replace(/&amp;lt;br\s*[^&]*&amp;gt;/gi, "\n");
+    output = decodeHtmlEntities(output);
+    output = output.replace(/<br\s*[^>]*>/gi, "\n");
+    output = output.replace(/<[^>]*>/g, "");
+    return output.replace(/\r/g, "").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  function normalizeDevice(name) {
+    return String(name || "-").replace(/_V\d+.*/i, "").replace(/\([A-Z]+\)/i, "").trim();
+  }
+
+  function parseInterface(token, fallbackType) {
+    if (!token) return null;
+    const m = String(token).replace(/[()]/g, "").match(/^(GigabitEthernet|GE|10GE|25GE|40GE|100GE)?\s*(\d+)[\/_-](\d+)[\/_-](\d+)$/i);
+    if (!m) return null;
+    let type = m[1] || fallbackType || "GigabitEthernet";
+    if (/^GE$/i.test(type)) type = "GigabitEthernet";
+    const portOnly = `${m[2]}/${m[3]}/${m[4]}`;
+    return { type, frame:m[2], slot:m[3], port:m[4], portOnly, cli:`${type} ${portOnly}`, display:`${type} ${portOnly}` };
+  }
+
+  function genericPort(portText) {
+    if (!portText) return null;
+    const p = String(portText).replace(/_/g,"/").replace(/-/g,"/");
+    const m = p.match(/^(\d+)\/(\d+)\/(\d+)$/);
+    return m ? { type:"PORT", frame:m[1], slot:m[2], port:m[3], portOnly:`${m[1]}/${m[2]}/${m[3]}`, display:`${m[1]}/${m[2]}/${m[3]}` } : null;
+  }
+
+  function parseTicket(input) {
+    const text = cleanText(input);
+    const links = [];
+    let m;
+
+    const crcPeer = /3BB_Metronet\s+CRC\s+Error\s+-?(ME-\d+-\d+)(?:_V\d+)?\s+((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)\s+to\s+(ME-\d+-\d+)(?:\([A-Z]+\))?_link\d*_(\d+\/\d+\/\d+)_OFC-null/gi;
+    while ((m = crcPeer.exec(text))) links.push({localDevice:normalizeDevice(m[1]),localInterface:parseInterface(m[2]),peerDevice:normalizeDevice(m[3]),peerInterface:genericPort(m[4]),kind:"CRC_PEER_DISCOVERY"});
+
+    const crcPair = /3BB_Metronet\s+CRC\s+Error\s+(MME-\d+-\d+|ME-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)\s+(MME-\d+-\d+|ME-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)/gi;
+    while ((m = crcPair.exec(text))) links.push({localDevice:normalizeDevice(m[1]),localInterface:parseInterface(m[2],"GigabitEthernet"),peerDevice:normalizeDevice(m[3]),peerInterface:parseInterface(m[4],"GigabitEthernet"),kind:"CRC_PAIR"});
+
+    const meOx = /(ME-\d+-\d+(?:_V\d+)?)_(\d+\/\d+\/\d+)__-__(OX_[A-Z0-9_]+)_(\d+\/\d+\/\d+)/gi;
+    while ((m = meOx.exec(text))) links.push({localDevice:normalizeDevice(m[1]),localInterface:genericPort(m[2]),peerDevice:m[3],peerInterface:genericPort(m[4]),kind:"ME_OX"});
+
+    const meMe = /(ME-\d+-\d+|MME-\d+-\d+)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)__-__(ME-\d+-\d+|MME-\d+-\d+)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)\d+[\/_-]\d+[\/_-]\d+)/gi;
+    while ((m = meMe.exec(text))) links.push({localDevice:normalizeDevice(m[1]),localInterface:parseInterface(m[2]),peerDevice:normalizeDevice(m[3]),peerInterface:parseInterface(m[4]),kind:"ME_ME"});
+
+    const multi = /\[\d+\]\.([A-Z]+-\d+-\d+)_([0-9]+\/[0-9]+\/[0-9]+)__-__([A-Z]+-\d+-\d+(?:\([A-Z]+\))?)_((?:GigabitEthernet|GE|10GE|25GE|40GE|100GE)?[0-9]+[\/_-][0-9]+[\/_-][0-9]+)/gi;
+    while ((m = multi.exec(text))) links.push({localDevice:normalizeDevice(m[1]),localInterface:parseInterface(m[2],"GigabitEthernet"),peerDevice:normalizeDevice(m[3]),peerInterface:parseInterface(m[4],"GigabitEthernet"),kind:"MULTI"});
+
+    const devices = [...text.matchAll(/(?:MME-\d+-\d+|ME-\d+-\d+|OX_[A-Z0-9_]+)/gi)].map(x=>normalizeDevice(x[0]));
+    return { text, links, devices:[...new Set(devices)], priority:(text.match(/SitePriority\s*=\s*(\d+)/i)||[])[1]||"-", job:/CRC/i.test(text)?"CRC ERROR":/ERPS\s+Loop\s+Broken/i.test(text)?"ERPS LOOP BROKEN":/LINK DOWN/i.test(text)?"LINK DOWN":/\bLOS\b/i.test(text)?"LOS":"UNKNOWN" };
+  }
+
+  function isOlt(name){ return /^(OX_|OLT)/i.test(name||""); }
+  function isRealMeInterface(intf){ return intf && ["GigabitEthernet","10GE","25GE","40GE","100GE"].includes(intf.type); }
+
+  function chooseContext(parsed, mode) {
+    if (mode === "OLT") {
+      const link = parsed.links.find(l=>isOlt(l.localDevice)||isOlt(l.peerDevice));
+      if (link) return isOlt(link.peerDevice) ? {localDevice:link.peerDevice,localInterface:link.peerInterface,peerDevice:link.localDevice,peerInterface:link.localInterface} : {localDevice:link.localDevice,localInterface:link.localInterface,peerDevice:link.peerDevice,peerInterface:link.peerInterface};
+    }
+    if (mode === "ME") {
+      const real = parsed.links.find(l=>!isOlt(l.localDevice)&&!isOlt(l.peerDevice)&&isRealMeInterface(l.localInterface));
+      if (real) return {localDevice:real.localDevice,localInterface:real.localInterface,peerDevice:real.peerDevice,peerInterface:real.peerInterface};
+      const anyMe = parsed.links.find(l=>!isOlt(l.localDevice));
+      if (anyMe) return {localDevice:anyMe.localDevice,localInterface:anyMe.localInterface,peerDevice:anyMe.peerDevice,peerInterface:anyMe.peerInterface};
+    }
+    const first=parsed.links[0];
+    return first?{localDevice:first.localDevice,localInterface:first.localInterface,peerDevice:first.peerDevice,peerInterface:first.peerInterface}:{localDevice:parsed.devices[0]||"-",localInterface:null,peerDevice:parsed.devices[1]||"-",peerInterface:null};
+  }
+
+  function selectedOptions(){ return [...document.querySelectorAll('#commandOptions input:checked')].map(x=>x.value); }
+  function selectedMode(){ return document.querySelector('input[name="mode"]:checked').value; }
+
+  function loginBlock(mode, device) {
+    const clean=normalizeDevice(device);
+    if(mode==="OLT") return `========================================\nLOGIN / REMOTE ACCESS\n========================================\n\ntelnet ${clean!=="-"?clean.toLowerCase():"[OLT-NAME]"}\n\nUser name : [username]\nUser password : [password]\n\nenable\nconfig\n`;
+    return `========================================\nLOGIN / REMOTE ACCESS\n========================================\n\nssh [username]@${clean}\n\nPassword : [password]\n`;
+  }
+
+  function meCommands(device,intf,opts,title) {
+    let out=loginBlock("ME",device);
+    const hasReal=isRealMeInterface(intf);
+    const cli=hasReal?intf.cli:"-";
+    const noSpace=hasReal?cli.replace(/\s+/g,""):"-";
+    const portOnly=intf&&intf.portOnly?intf.portOnly:"-";
+    out+=`\nDEVICE : ${device}\nPORT : ${hasReal?cli:portOnly}\n`;
+
+    if(opts.includes("interface")) out+=hasReal?`\n# Interface Status / Traffic / Optical\ndisplay interface ${cli}\n`:`\n# ยังไม่ทราบชนิด Interface\ndisplay interface description | include ${portOnly}\n`;
+    if(opts.includes("crc")) out+=hasReal?`\n# CRC / Error\ndisplay interface brief\ndisplay interface brief | include ${noSpace}\n`:`\n# CRC: ค้นหา Interface จริงก่อน\ndisplay interface description | include ${portOnly}\n`;
+    if(opts.includes("optical")) out+=hasReal?`\n# Optical Power\n# ค่า RX/TX อยู่ในผล display interface\ndisplay interface ${cli}\n`:`\n# Optical: ค้นหา Interface จริงก่อน\ndisplay interface description | include ${portOnly}\n`;
+    if(opts.includes("battery")) out+=`\n# Power / Battery / Hardware\ndisplay power\ndisplay device\ndisplay alarm active\ndisplay logbuffer\n\n# Optional เฉพาะรุ่นที่รองรับ\n# display battery information\n# display health\n`;
+    if(opts.includes("alarm")) out+=`\n# Alarm / Log\ndisplay alarm active\ndisplay logbuffer\n`;
+    if(opts.includes("topology")) out+=`\n# LLDP / Description\ndisplay lldp neighbor brief\ndisplay interface description${portOnly!=="-"?` | include ${portOnly}`:""}\n`;
+    if(opts.includes("config")) out+=hasReal?`\n# Port Configuration - อาจต้องใช้สิทธิ์สูง\ndisplay current-configuration interface ${cli}\n`:`\n# Port Configuration: ต้องหา Interface จริงก่อน\n`;
+    if(opts.includes("reset")) out+=hasReal?`\n# DANGER: Reset Counter หลังได้รับอนุญาต\nreset counters interface ${cli}\n# Observe อย่างน้อย 10 นาที\n`:`\n# Reset Counter ไม่พร้อม เพราะยังไม่พบ Interface จริง\n`;
+    if(opts.includes("bounce")) out+=hasReal?`\n# DANGER: Port Bounce หลังตรวจ Topology และได้รับอนุญาต\nsystem-view\ninterface ${cli}\nshutdown\nundo shutdown\n# Observe อย่างน้อย 10 นาที\n`:`\n# Port Bounce ไม่พร้อม เพราะยังไม่พบ Interface จริง\n`;
+    return out;
+  }
+
+  function oltModel(title,device){ if(/MA5800/i.test(title))return"MA5800"; if(/MA5608T|_01HW/i.test(title+device))return"MA5608T"; return"UNKNOWN"; }
+
+  function oltCommands(device,intf,opts,title) {
+    let out=loginBlock("OLT",device);
+    const model=oltModel(title,device), slot=intf&&intf.slot?intf.slot:"[slot]", port=intf&&intf.port?intf.port:"[port]";
+    const card=model==="MA5800"?"mpu":"mcu";
+    out+=`\nDEVICE : ${device}\nOLT MODEL : ${model}\nSLOT/PORT : 0/${slot}/${port}\n`;
+    if(opts.includes("interface")) out+=`\n# Board / Port Status\ndisplay board 0/${slot}\ndisplay lldp neighbor brief\n`;
+    if(opts.includes("crc")) out+=`\n# CRC / Port Statistics\ninterface ${card} 0/${slot}\ndisplay port statistics ${port}\n`;
+    if(opts.includes("optical")) out+=`\n# OLT DDM / Optical Power\ninterface ${card} 0/${slot}\ndisplay port ddm-info ${port}\n`;
+    if(opts.includes("battery")) out+=`\n# Power / Battery / AC Fail\ninterface emu 1\ndisplay power run info\nquit\ndisplay alarm active\ndisplay alarm active all\ndisplay logbuffer\n`;
+    if(opts.includes("alarm")) out+=`\n# Alarm / Log\ndisplay alarm active\ndisplay alarm active all\ndisplay logbuffer\n`;
+    if(opts.includes("topology")) out+=`\n# LLDP / Board\ndisplay lldp neighbor brief\ndisplay board 0/${slot}\n`;
+    if(opts.includes("config")) out+=`\n# Current Configuration\ndisplay current-configuration\n`;
+    if(opts.includes("ont")) out+=`\n# GPON / ONT Optical และ Battery State\ninterface gpon 0/${slot}\ndisplay ont optical-info ${slot} ${port} all\ndisplay ont info 0 ${slot} ${port} all\n`;
+    if(opts.includes("reset")) out+=`\n# DANGER: Reset Port Statistics หลังได้รับอนุญาต\ninterface ${card} 0/${slot}\nreset port statistics ${port}\n# Observe อย่างน้อย 10 นาที\n`;
+    if(opts.includes("bounce")) out+=`\n# DANGER: Port Bounce หลังตรวจ Topology และได้รับอนุญาต\ninterface ${card} 0/${slot}\nshutdown ${port}\nundo shutdown ${port}\n# Observe อย่างน้อย 10 นาที\n`;
+    return out;
+  }
+
+  function generateSelected(){
+    const input=document.getElementById('jobInput').value;
+    if(!input.trim()){alert('กรุณาวาง Job Ticket');return;}
+    const parsed=parseTicket(input), mode=selectedMode(), opts=selectedOptions(), ctx=chooseContext(parsed,mode);
+    if(opts.length===0){alert('กรุณาเลือกอย่างน้อย 1 หัวข้อคำสั่ง');return;}
+    let out=`========================================\nJOB SUMMARY\n========================================\n\nJOB TYPE : ${parsed.job}\nSITE PRIORITY : ${parsed.priority}\nMODE : ${mode}\nLOCAL : ${ctx.localDevice} ${ctx.localInterface?ctx.localInterface.display||ctx.localInterface.portOnly:'-'}\nPEER : ${ctx.peerDevice} ${ctx.peerInterface?ctx.peerInterface.display||ctx.peerInterface.portOnly:'-'}\n\n`;
+    out+=mode==="OLT"?oltCommands(ctx.localDevice,ctx.localInterface,opts,parsed.text):meCommands(ctx.localDevice,ctx.localInterface,opts,parsed.text);
+    if(document.getElementById('bothSides').checked && ctx.peerDevice && ctx.peerDevice!=="-"){
+      out+=`\n\n========================================\nPEER SIDE\n========================================\n\n`;
+      out+=isOlt(ctx.peerDevice)?oltCommands(ctx.peerDevice,ctx.peerInterface,opts,parsed.text):meCommands(ctx.peerDevice,ctx.peerInterface,opts,parsed.text);
+    }
+    out+=`\n\n========================================\nSAFETY NOTE\n========================================\n\n- Reset Counter และ Port Bounce ใช้เมื่อได้รับอนุญาตเท่านั้น\n- ตรวจ Description / LLDP / Topology ก่อน shutdown\n- หลังเปลี่ยนค่าให้ Observe อย่างน้อย 10 นาที\n`;
+    document.getElementById('result').value=out.replace(/\n{3,}/g,'\n\n').trim();
+  }
+
+  function presetForMode(){
+    const mode=selectedMode();
+    const recommended=mode==="OLT"?["interface","crc","optical","battery","alarm","topology"]:["interface","crc","optical","battery","alarm","topology"];
+    document.querySelectorAll('#commandOptions input').forEach(x=>x.checked=recommended.includes(x.value));
+  }
+
+  function toggleAllOptions(){
+    const boxes=[...document.querySelectorAll('#commandOptions input')];
+    const enable=boxes.some(x=>!x.checked);
+    boxes.forEach(x=>x.checked=enable);
+  }
+
+  function clearAll(){ document.getElementById('jobInput').value=''; document.getElementById('result').value=''; }
+  function copyResult(){ const box=document.getElementById('result'); if(!box.value.trim()){alert('ยังไม่มีข้อความให้ Copy');return;} navigator.clipboard.writeText(box.value).then(()=>alert('Copy เรียบร้อยแล้ว')).catch(()=>{box.select();document.execCommand('copy');alert('Copy เรียบร้อยแล้ว');}); }
+</script>
+</body>
 </html>
